@@ -1,0 +1,24 @@
+import logo from './logo.svg';
+import './App.css';
+import Hello from './components/Hello';
+import { useState } from 'react';
+import User from './components/User';
+function App()
+{
+  let a = 5;
+  const [count, setCount] = useState(0);
+  const handleClick = () => {
+    setCount(count + 1);
+  };
+  return (
+    <div className="App">
+      <>
+        <h1>welcome to my first react app!</h1>
+        <p>ClickCount: {count}</p>
+        {}
+        <button onClick={handleClick}>Increment Count</button>
+      </>
+    </div>
+  );
+}
+export default App;

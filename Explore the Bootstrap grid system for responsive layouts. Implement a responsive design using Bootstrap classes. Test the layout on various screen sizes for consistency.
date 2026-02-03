@@ -1,0 +1,85 @@
+//Index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+// Import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+//App.js
+import React from 'react';
+function App() 
+{
+  return (
+    <div className="container my-5">
+      {}
+      <h1 className="text-center text-primary mb-4">
+        Bootstrap Responsive Grid 📱💻
+      </h1>
+      <p className="text-center mb-5">
+        Resize the screen to see the layout adapt automatically.
+      </p>
+      {}
+      <div className="row g-4">
+        {/* Card 1 */}
+        <div className="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div className="card h-100 shadow">
+            <div className="card-body">
+              <h5 className="card-title">Mobile First</h5>
+              <p className="card-text">
+                Full width on small screens.
+              </p>
+              <span className="badge bg-primary">col-12</span>
+            </div>
+          </div>
+        </div>
+        {}
+        <div className="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div className="card h-100 shadow">
+            <div className="card-body">
+              <h5 className="card-title">Small Screens</h5>
+              <p className="card-text">
+                Two columns on phones.
+              </p>
+              <span className="badge bg-success">col-sm-6</span>
+            </div>
+          </div>
+        </div>
+        {}
+        <div className="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div className="card h-100 shadow">
+            <div className="card-body">
+              <h5 className="card-title">Tablets</h5>
+              <p className="card-text">
+                Three columns on tablets.
+              </p>
+              <span className="badge bg-warning text-dark">col-md-4</span>
+            </div>
+          </div>
+        </div>
+        {}
+        <div className="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div className="card h-100 shadow">
+            <div className="card-body">
+              <h5 className="card-title">Desktops</h5>
+              <p className="card-text">
+                Four columns on large screens.
+              </p>
+              <span className="badge bg-danger">col-lg-3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {}
+      <div className="alert alert-info text-center mt-5">
+        ✔ Responsive layout tested using Bootstrap grid system
+      </div>
+    </div>
+  );
+}
+export default App;

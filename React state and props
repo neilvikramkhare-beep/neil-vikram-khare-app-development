@@ -1,0 +1,47 @@
+//App.js
+import React, { useState } from "react";
+import UserCard from "./UserCard";
+function App() {
+  // State in parent component
+  const [user, setUser] = useState({
+    name: "John Doe",
+    age: 25
+  });
+  const updateAge = () => {
+    setUser({
+      ...user,
+      age: user.age + 1
+    });
+  };
+  return (
+    <div className="container mt-5">
+      <h2 className="text-center mb-4">React Props & State Example</h2>
+      {/* Passing state as props */}
+      <UserCard name={user.name} age={user.age} />
+      <div className="text-center mt-3">
+        <button className="btn btn-primary" onClick={updateAge}>
+          Increase Age
+        </button>
+      </div>
+    </div>
+  );
+}
+export default App;
+//UserCard.js
+import React from "react";
+function UserCard(props) {
+  return (
+    <div className="card text-center shadow">
+      <div className="card-body">
+        <h5 className="card-title">User Details</h5>
+        <p className="card-text">
+          <strong>Name:</strong> {props.name}
+        </p>
+        <p className="card-text">
+          <strong>Age:</strong> {props.age}
+        </p>
+      </div>
+    </div>
+  );
+}
+export default UserCard;

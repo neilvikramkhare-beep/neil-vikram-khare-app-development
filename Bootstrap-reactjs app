@@ -1,0 +1,23 @@
+//App.css
+import React from 'react';
+import './App.css';
+function App() { 
+  return (
+    <div className="App">
+      <button type="button" className="btn btn-primary"> Primary Button</button>
+    </div>
+  ); 
+}
+export default App;
+//ExampleCarousel.js
+import React from 'react';
+import Carousel from 'react-bootstrap';
+function ExampleCarousel() { 
+  return (
+    <Carousel>
+      <Carousel.Item interval={1000}>
+        <img className="d-block w-100" /> 
+      </Carousel.Item> 
+    </Carousel> 
+  ); 
+}

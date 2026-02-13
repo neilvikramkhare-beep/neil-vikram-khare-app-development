@@ -1,0 +1,708 @@
+//App.css
+:root {
+  --bg-color: #f0f0f0;
+  --text-color: #000;
+  --accent-color: #007bff;  
+}
+[data-theme="dark"] {
+  --bg-color: #0a0a0a; 
+  --text-color: #00ff00;
+  --accent-color: #00bfff;  
+}
+.app {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 20px;
+  font-family: 'Courier New', monospace;  
+}
+button {
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+th, td {
+  border: 1px solid var(--text-color);
+  padding: 8px;
+  text-align: left;
+}
+//App.js
+import React from "react";
+import { Container, Navbar } from "react-bootstrap";
+import ScanForm from "./components/ScanForm";
+import Analytics from "./components/Analytics";
+function App() {
+  return (
+    <>
+      <Navbar bg="dark" variant="dark" className="mb-4">
+        <Container>
+          <Navbar.Brand>Cyber Risk Scanner</Navbar.Brand>
+        </Container>
+      </Navbar>
+      <Container>
+        <ScanForm />
+        <hr className="my-5" />
+        <Analytics />
+      </Container>
+    </>
+  );
+}
+export default App;
+//index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import App from './App';
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+//ScanResult.js
+import React from "react";
+import { Card, Badge } from "react-bootstrap";
+function getVariant(severity) {
+  switch (severity) {
+    case "Low":
+      return "success";
+    case "Medium":
+      return "warning";
+    case "High":
+      return "danger";
+    case "Critical":
+      return "dark";
+    default:
+      return "secondary";
+  }
+}
+function ScanResult({ result }) {
+  return (
+    <Card.Body>
+      <hr />
+      <h5>
+        Score: <strong>{result.score}</strong>{" "}
+        <Badge bg={getVariant(result.severity)}>
+          {result.severity}
+        </Badge>
+      </h5>
+      <Card className="mt-3">
+        <Card.Body>
+          <Card.Title>AI Risk Analysis</Card.Title>
+          <Card.Text>{result.ai_analysis}</Card.Text>
+        </Card.Body>
+      </Card>
+      <Card className="mt-3">
+        <Card.Body>
+          <Card.Title>Breach Report</Card.Title>
+          <Card.Text>{JSON.stringify(result.report)}</Card.Text>
+        </Card.Body>
+      </Card>
+    </Card.Body>
+  );
+}
+export default ScanResult;
+//ScanForm.js
+import React, { useState } from "react";
+import axios from "axios";
+import { Form, Button, Card, Spinner } from "react-bootstrap";
+import ScanResult from "./ScanResult";
+function ScanForm() {
+  const [url, setUrl] = useState("");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleScan = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setResult(null);
+    try {
+      const response = await axios.post("http://localhost:5000/scan", {
+        url: url,
+      });
+      setResult(response.data);
+    } catch (error) {
+      alert("Scan failed");
+    }
+    setLoading(false);
+  };
+  return (
+    <Card>
+      <Card.Body>
+        <Card.Title>Scan a Website</Card.Title>
+        <Form onSubmit={handleScan}>
+          <Form.Group>
+            <Form.Control
+              type="text"
+              placeholder="Enter domain (example.com)"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Button
+            variant="primary"
+            type="submit"
+            className="mt-3"
+            disabled={loading}
+          >
+            {loading ? <Spinner animation="border" size="sm" /> : "Scan"}
+          </Button>
+        </Form>
+      </Card.Body>
+      {result && <ScanResult result={result} />}
+    </Card>
+  );
+}
+export default ScanForm;
+//App.js
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import TypeIt from 'typeit-react';
+import './App.css';  
+function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [url, setUrl] = useState('');
+  const [scanResult, setScanResult] = useState(null);
+  const [analytics, setAnalytics] = useState([]);
+  const [aiText, setAiText] = useState('');
+  const [theme, setTheme] = useState('dark');  
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+  useEffect(() => {
+    if (token) {
+      fetchAnalytics();
+      const interval = setInterval(fetchAnalytics, 10000);  
+      return () => clearInterval(interval);
+    }
+  }, [token]);
+  const login = async (username, password) => {
+    try {
+      const res = await axios.post('/login', { username, password });
+      const newToken = res.data.access_token;
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const fetchAnalytics = async () => {
+    try {
+      const res = await axios.get('/analytics', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAnalytics(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleScan = async () => {
+    try {
+      const res = await axios.post('/scan', { url }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setScanResult(res.data);
+      setAiText(res.data.ai_analysis);  
+    } catch (err) {
+      console.error(err);
+    }
+  };
+}
+  const trendData = analytics
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+    .map(log => ({ timestamp: log.timestamp.slice(0, 10), score: log.score }));  
+  return (
+    <div className="app">
+      <header>
+        <h1>Cybersecurity Dashboard</h1>
+        <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+          Toggle Theme
+        </button>
+      </header>
+      {}
+      {token && (
+        <>
+          <section className="scan-section">
+            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="Enter URL" />
+            <button onClick={handleScan}>Scan</button>
+            {scanResult && (
+              <div>
+                <p>Score: {scanResult.score} ({scanResult.severity})</p>
+                <TypeIt
+                  options={{ speed: 50, waitUntilVisible: true }}
+                  getBeforeInit={instance => {
+                    instance.type(aiText);
+                    return instance;
+                  }}
+                />
+              </div>
+            )}
+          </section>
+
+          <section className="admin-dashboard">
+            <h2>Admin Dashboard - Scan Logs</h2>
+            <table>
+              <thead>
+                <tr><th>Domain</th><th>Score</th><th>Severity</th><th>Timestamp</th></tr>
+              </thead>
+              <tbody>
+                {analytics.map((log, i) => (
+                  <tr key={i}>
+                    <td>{log.domain}</td><td>{log.score}</td><td>{log.severity}</td><td>{log.timestamp}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <h2>Risk Trend Graph</h2>
+            <LineChart width={600} height={300} data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="timestamp" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="score" stroke="#00ff00" />  {}
+            </LineChart>
+          </section>
+        </>
+      )}
+    </div>
+  );
+export default App;
+//scanner.py
+import socket
+import ssl
+import datetime
+import requests
+from urllib.parse import urlparse
+def scan_website(url):
+    parsed = urlparse(url)
+    hostname = parsed.hostname
+    results = {}
+    try:
+        context = ssl.create_default_context()
+        with socket.create_connection((hostname, 443), timeout=5) as sock:
+            with context.wrap_socket(sock, server_hostname=hostname) as ssock:
+                cert = ssock.getpeercert()
+                expiry = datetime.datetime.strptime(
+                    cert["notAfter"], "%b %d %H:%M:%S %Y %Z"
+                )
+                results["ssl_valid"] = True
+                results["ssl_expires_days"] = (expiry - datetime.datetime.utcnow()).days
+    except:
+        results["ssl_valid"] = False
+    try:
+        r = requests.get(url, timeout=5)
+        headers = r.headers
+        missing = []
+        important = [
+            "Strict-Transport-Security",
+            "Content-Security-Policy",
+            "X-Frame-Options",
+            "X-Content-Type-Options"
+        ]
+        for h in important:
+            if h not in headers:
+                missing.append(h)
+        results["missing_headers"] = missing
+    except:
+        results["missing_headers"] = ["Header scan failed"]
+    open_ports = []
+    for port in [21,22,23,80,443,3306]:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1)
+        if s.connect_ex((hostname, port)) == 0:
+            open_ports.append(port)
+        s.close()
+    results["open_ports"] = open_ports
+    return results
+//ScanResult.js
+import React from "react";
+import { Card, Badge } from "react-bootstrap";
+function getVariant(severity) {
+  switch (severity) {
+    case "Low":
+      return "success";
+    case "Medium":
+      return "warning";
+    case "High":
+      return "danger";
+    case "Critical":
+      return "dark";
+    default:
+      return "secondary";
+  }
+}
+function ScanResult({ result }) {
+  return (
+    <Card.Body>
+      <hr />
+      <h5>
+        Score: <strong>{result.score}</strong>{" "}
+        <Badge bg={getVariant(result.severity)}>
+          {result.severity}
+        </Badge>
+      </h5>
+      <Card className="mt-3">
+        <Card.Body>
+          <Card.Title>AI Risk Analysis</Card.Title>
+          <Card.Text>{result.ai_analysis}</Card.Text>
+        </Card.Body>
+      </Card>
+      <Card className="mt-3">
+        <Card.Body>
+          <Card.Title>Breach Report</Card.Title>
+          <Card.Text>{JSON.stringify(result.report)}</Card.Text>
+        </Card.Body>
+      </Card>
+    </Card.Body>
+  );
+}
+export default ScanResult;
+//ScanForm.js
+import React, { useState } from "react";
+import axios from "axios";
+import { Form, Button, Card, Spinner } from "react-bootstrap";
+import ScanResult from "./ScanResult";
+function ScanForm() {
+  const [url, setUrl] = useState("");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const handleScan = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setResult(null);
+    try {
+      const response = await axios.post("http://localhost:5000/scan", {
+        url: url,
+      });
+      setResult(response.data);
+    } catch (error) {
+      alert("Scan failed");
+    }
+    setLoading(false);
+  };
+  return (
+    <Card>
+      <Card.Body>
+        <Card.Title>Scan a Website</Card.Title>
+        <Form onSubmit={handleScan}>
+          <Form.Group>
+            <Form.Control
+              type="text"
+              placeholder="Enter domain (example.com)"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Button
+            variant="primary"
+            type="submit"
+            className="mt-3"
+            disabled={loading}
+          >
+            {loading ? <Spinner animation="border" size="sm" /> : "Scan"}
+          </Button>
+        </Form>
+      </Card.Body>
+      {result && <ScanResult result={result} />}
+    </Card>
+  );
+}
+export default ScanForm;
+//breaches.py
+import requests
+import os
+def check_breach(domain):
+    url = f"https://haveibeenpwned.com/api/v3/breaches"
+    headers = {
+        "hibp-api-key": os.getenv("HIBP_API_KEY"),
+        "user-agent": "CyberRiskMonitor"
+    }
+//App.js
+import React from "react";
+import { Container, Navbar } from "react-bootstrap";
+import ScanForm from "./components/ScanForm";
+import Analytics from "./components/Analytics";
+function App() {
+  return (
+    <>
+      <Navbar bg="dark" variant="dark" className="mb-4">
+        <Container>
+          <Navbar.Brand>Cyber Risk Scanner</Navbar.Brand>
+        </Container>
+      </Navbar>
+      <Container>
+        <ScanForm />
+        <hr className="my-5" />
+        <Analytics />
+      </Container>
+    </>
+  );
+}
+export default App;
+//mainApp.js
+from flask import Flask, request, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_cors import CORS
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from config import Config
+from utils.scanner import scan_website
+from utils.risk_ai import ai_risk_analysis
+from utils.breach import check_breach
+import datetime
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
+app = Flask(__name__)
+app.config.from_object(Config)
+app.config['JWT_SECRET_KEY'] = 'your-secret-key-change-this'  # Change in production
+CORS(app)
+limiter = Limiter(get_remote_address, app=app, default_limits=["10 per minute"])
+jwt = JWTManager(app)
+engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])  # Recommend postgresql:// for prod
+Base = declarative_base()
+class Tenant(Base):
+    __tablename__ = "tenants"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+    users = relationship("User", backref="tenant")
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True)
+    password_hash = Column(String)
+    tenant_id = Column(Integer, ForeignKey('tenants.id'))
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+class ScanLog(Base):
+    __tablename__ = "scan_logs"
+    id = Column(Integer, primary_key=True)
+    domain = Column(String)
+    score = Column(Integer)
+    severity = Column(String)
+    timestamp = Column(String)
+    tenant_id = Column(Integer, ForeignKey('tenants.id'))  
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+def calculate_score(results):
+    score = 100
+    if not results["ssl_valid"]:
+        score -= 30
+    score -= len(results["missing_headers"]) * 5
+    score -= len(results["open_ports"]) * 3
+    return max(score, 0)
+def severity_level(score):
+    if score >= 80: return "Low"
+    if score >= 60: return "Medium"
+    if score >= 40: return "High"
+    return "Critical"
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+    tenant_name = data.get("tenant_name")  
+    if not username or not password or not tenant_name:
+        return jsonify({"error": "Missing fields"}), 400
+    session = Session()
+    if session.query(User).filter_by(username=username).first():
+        session.close()
+        return jsonify({"error": "Username exists"}), 400
+    if session.query(Tenant).filter_by(name=tenant_name).first():
+        session.close()
+        return jsonify({"error": "Tenant exists"}), 400
+    tenant = Tenant(name=tenant_name)
+    session.add(tenant)
+    session.commit()
+    user = User(username=username, tenant_id=tenant.id)
+    user.set_password(password)
+    session.add(user)
+    session.commit()
+    session.close()
+    return jsonify({"message": "Registered successfully"}), 201
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+    if not username or not password:
+        return jsonify({"error": "Missing fields"}), 400
+    session = Session()
+    user = session.query(User).filter_by(username=username).first()
+    session.close()
+    if not user or not user.check_password(password):
+        return jsonify({"error": "Invalid credentials"}), 401
+    access_token = create_access_token(identity={"id": user.id, "tenant_id": user.tenant_id})
+    return jsonify({"access_token": access_token}), 200
+@app.route("/scan", methods=["POST"])
+@limiter.limit("5 per minute")
+@jwt_required()
+def scan():
+    current_user = get_jwt_identity()
+    tenant_id = current_user['tenant_id']
+    data = request.get_json()
+    url = data.get("url")
+    if not url:
+        return jsonify({"error": "URL required"}), 400
+    results = scan_website(url)
+    breach_report = check_breach(url)
+    score = calculate_score(results)
+    severity = severity_level(score)
+    ai_analysis = ai_risk_analysis(results)
+    session = Session()
+    log = ScanLog(
+        domain=url,
+        score=score,
+        severity=severity,
+        timestamp=str(datetime.datetime.utcnow()),
+        tenant_id=tenant_id
+    )
+    session.add(log)
+    session.commit()
+    session.close()
+    return jsonify({
+        "score": score,
+        "severity": severity,
+        "site_result": str(results),
+        "report": breach_report,
+        "ai_analysis": ai_analysis
+    })
+@app.route("/analytics")
+@jwt_required()
+def analytics():
+    current_user = get_jwt_identity()
+    tenant_id = current_user['tenant_id']
+    session = Session()
+    logs = session.query(ScanLog).filter_by(tenant_id=tenant_id).all()
+    session.close()
+    data = [{
+        "domain": l.domain,
+        "score": l.score,
+        "severity": l.severity,
+        "timestamp": l.timestamp
+    } for l in logs]
+    return jsonify(data)
+if __name__ == "__main__":
+    app.run()
+//RiskAI.py
+import os
+from openai import OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+def ai_risk_analysis(scan_data):
+    prompt = f"""
+    Analyze this cybersecurity scan result and provide:
+    1. Executive summary
+    2. Main vulnerabilities
+    3. Risk classification explanation
+    4. Recommended remediation steps
+    Scan Data:
+    {scan_data}
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
+    )
+    return response.choices[0].message.content
+//App.py
+from flask import Flask, request, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_cors import CORS
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import declarative_base, sessionmaker
+from config import Config
+from utils.scanner import scan_website
+from utils.risk_ai import ai_risk_analysis
+from utils.breach import check_breach
+import datetime
+app = Flask(__name__)
+app.config.from_object(Config)
+CORS(app)
+limiter = Limiter(get_remote_address, app=app, default_limits=["10 per minute"])
+engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+Base = declarative_base()
+class ScanLog(Base):
+    __tablename__ = "scan_logs"
+    id = Column(Integer, primary_key=True)
+    domain = Column(String)
+    score = Column(Integer)
+    severity = Column(String)
+    timestamp = Column(String)
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+def calculate_score(results):
+    score = 100
+    if not results["ssl_valid"]:
+        score -= 30
+    score -= len(results["missing_headers"]) * 5
+    score -= len(results["open_ports"]) * 3
+    return max(score, 0)
+def severity_level(score):
+    if score >= 80: return "Low"
+    if score >= 60: return "Medium"
+    if score >= 40: return "High"
+    return "Critical"
+@app.route("/scan", methods=["POST"])
+@limiter.limit("5 per minute")
+def scan():
+    data = request.get_json()
+    url = data.get("url")
+    if not url:
+        return jsonify({"error": "URL required"}), 400
+    results = scan_website(url)
+    breach_report = check_breach(url)
+    score = calculate_score(results)
+    severity = severity_level(score)
+    ai_analysis = ai_risk_analysis(results)
+    session = Session()
+    log = ScanLog(
+        domain=url,
+        score=score,
+        severity=severity,
+        timestamp=str(datetime.datetime.utcnow())
+    )
+    session.add(log)
+    session.commit()
+    session.close()
+    return jsonify({
+        "score": score,
+        "severity": severity,
+        "site_result": str(results),
+        "report": breach_report,
+        "ai_analysis": ai_analysis
+    })
+@app.route("/analytics")
+def analytics():
+    session = Session()
+    logs = session.query(ScanLog).all()
+    session.close()
+    data = [{
+        "domain": l.domain,
+        "score": l.score,
+        "severity": l.severity,
+        "timestamp": l.timestamp
+    } for l in logs]
+    return jsonify(data)
+if __name__ == "__main__":
+    app.run()
+//code.env
+OPENAI_API_KEY=your_openai_key
+HIBP_API_KEY=your_haveibeenpwned_key
+SECRET_KEY=super_secret_key
+//config.py
+import os
+from dotenv import load_dotenv
+load_dotenv()
+class Config:
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    HIBP_API_KEY = os.getenv("HIBP_API_KEY")
+    SQLALCHEMY_DATABASE_URI = "sqlite:///analytics.db"

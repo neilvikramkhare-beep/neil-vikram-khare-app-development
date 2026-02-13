@@ -1,0 +1,358 @@
+//App.js
+import React, { useState } from 'react';
+import './App.css';
+function Greeting(props) {
+  return <h2 className="text-primary">Hello, {props.name}!</h2>;
+}
+function Counter() {
+  const [count, setCount] = useState(0);
+  const handleClick = () => {
+    setCount(count + 1);
+  };
+  return (
+    <div className="p-3 mb-2 bg-light">
+      <p>Current count: **{count}**</p>
+      {}
+      <DisplayCount countValue={count} />
+      {}
+      <button onClick={handleClick} className="btn btn-success">
+        Increment
+      </button>
+    </div>
+  );
+}
+function DisplayCount(props) {
+  return (
+    <p className="text-info">
+      The count value passed as a prop is: {props.countValue}
+    </p>
+  );
+}
+function InputForm() {
+  const [name, setName] = useState('');
+  const [message, setMessage] = useState('');
+  const handleChange = (event) => {
+    setName(event.target.value);
+  };
+  const handleSubmit = (event) => {
+    event.preventDefault(); 
+    setMessage(`Form submitted for: ${name}`);
+    setName('');
+  };
+  return (
+    <div className="p-3 mb-2 bg-info text-white">
+      <h4>Input Form</h4>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label htmlFor="nameInput" className="form-label">
+            Enter Name:
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="nameInput"
+            value={name}
+            onChange={handleChange}
+            placeholder="Your name"
+          />
+        </div>
+        <button type="submit" className="btn btn-dark">
+          Submit
+        </button>
+      </form>
+      {message && <p className="mt-3">{message}</p>}
+    </div>
+  );
+}
+function Toggler() {
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+  return (
+    <div className="p-3 mb-2 bg-warning">
+      <h4>Conditional Rendering</h4>
+      <button onClick={toggleVisibility} className="btn btn-secondary mb-3">
+        {isVisible ? 'Hide Content' : 'Show Content'}
+      </button>
+      {}
+      {isVisible && (
+        <div className="alert alert-dark mt-2" role="alert">
+          This content is now visible!
+        </div>
+      )}
+    </div>
+  );
+}
+function TodoList() {
+  const todos = ['Learn React', 'Build a project', 'Deploy the app'];
+  return (
+    <div className="p-3 mb-2 bg-danger text-white">
+      <h4>Todo List</h4>
+      <ul className="list-group">
+        {}
+        {todos.map((todo, index) => (
+          <li key={index} className="list-group-item list-group-item-danger">
+            {todo}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+function App() 
+{
+  return (
+    <div className="App container mt-5">
+      <header className="App-header p-4 mb-4 bg-dark text-white rounded">
+        <h1>Basic React App with Bootstrap</h1>
+      </header>
+      {}
+      <Greeting name="React Developer" />
+      <div className="row">
+        <div className="col-md-6">
+          {}
+          <Counter />
+        </div>
+        {}
+        <div className="col-md-6">
+            <InputForm />
+        </div>
+        <div className="col-md-6">
+            <Toggler />
+        </div>
+        <div className="col-md-6">
+            <TodoList />
+        </div>
+
+      </div>
+    </div>
+  );
+}
+function ProgressTracker({ countValue }) 
+{
+  const progress = Math.min((countValue / 10) * 100, 100);
+  return (
+    <div className="p-3 mb-2 bg-white border rounded shadow-sm">
+      <h4>Goal Progress (Target: 10)</h4>
+      <div className="progress" style={{ height: '30px' }}>
+        <div 
+          className={`progress-bar progress-bar-striped progress-bar-animated ${progress === 100 ? 'bg-success' : 'bg-primary'}`} 
+          role="progressbar" 
+          style={{ width: `${progress}%` }}
+        >
+          {progress}%
+        </div>
+      </div>
+      {progress === 100 && <p className="text-success mt-2">🎉 Goal Reached!</p>}
+    </div>
+  );
+}
+function SearchableList() {
+  const items = ['Blueberry', 'Banana', 'Apple', 'Dragonfruit', 'Cherry'];
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredItems = items.filter(item => 
+    item.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  return (
+    <div className="p-3 mb-2 bg-light border rounded">
+      <h4>Quick Filter</h4>
+      <input 
+        type="text" 
+        className="form-control mb-3" 
+        placeholder="Search fruit..." 
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <div className="d-flex flex-wrap gap-2">
+        {filteredItems.map((item, i) => (
+          <span key={i} className="badge bg-secondary p-2">{item}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+function ThemeCard() {
+  const [isDark, setIsDark] = useState(false);
+  return (
+    <div className={`p-4 mb-2 rounded transition-all ${isDark ? 'bg-dark text-white' : 'bg-white text-dark border'}`} style={{ transition: '0.3s' }}>
+      <h4>Theme Switcher</h4>
+      <p>Current mode: <strong>{isDark ? 'Midnight' : 'Daylight'}</strong></p>
+      <div className="form-check form-switch">
+        <input 
+          className="form-check-input" 
+          type="checkbox" 
+          role="switch" 
+          onChange={() => setIsDark(!isDark)} 
+        />
+        <label className="form-check-label">Toggle Dark Mode</label>
+      </div>
+    </div>
+  );
+}
+export default App;
+//AppLayout.js
+import React from 'react';
+import styles from './AppLayout.module.css';
+const AppLayout = ({ children }) => {
+  return (
+    <div className={styles.appContainer}>
+      <header className={styles.header}>
+        <h1 style={{ fontSize: '1.5rem', margin: 0 }}>React Dashboard</h1>
+        <div className={styles.userProfile}>Developer Mode</div>
+      </header>
+      <main className={styles.mainContent}>
+        {}
+        {React.Children.map(children, child => (
+          <div className={styles.card}>{child}</div>
+        ))}
+      </main>
+    </div>
+  );
+};
+export default AppLayout;
+//AppLayoutModule.css
+.appContainer {
+  display: grid;
+  grid-template-areas: 
+    "header header"
+    "main main";
+  grid-template-rows: 80px 1fr;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Vibrant background for glass effect */
+  font-family: 'Inter', sans-serif;
+}
+.header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+.mainContent {
+  grid-area: main;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+.card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1.5rem;
+  color: white;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-5px);
+}
+//Child.js
+                              import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+export const Greeting = ({ name }) => (
+  <motion.h2 
+    className="text-primary"
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+  >
+    Hello, {name}!
+  </motion.h2>
+);
+export const DisplayCount = ({ countValue }) => (
+  <p className="text-info">
+    The count value passed as a prop is: {countValue}
+  </p>
+);
+export const TodoList = ({ items }) => (
+  <div className="p-3 mb-2 bg-danger text-white rounded">
+    <h4>Todo List</h4>
+    <ul className="list-group">
+      {items.map((todo, index) => (
+        <motion.li 
+          key={index} 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: index * 0.1 }}
+          className="list-group-item list-group-item-danger"
+        >
+          {todo}
+        </motion.li>
+      ))}
+    </ul>
+  </div>
+);
+export const ToggleContent = ({ isVisible }) => (
+  <AnimatePresence>
+    {isVisible && (
+      <motion.div 
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: 'auto', opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        className="alert alert-dark mt-2"
+      >
+        This content is now visible!
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+//Parent.js
+                              import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Greeting, DisplayCount, TodoList, ToggleContent } from './Child';
+function Parent()
+ {
+  const [count, setCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const todos = ['Learn React', 'Build a project', 'Deploy the app'];
+  return (
+    <div className="container mt-5">
+      <motion.header 
+        className="p-4 mb-4 bg-dark text-white rounded"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+      >
+        <h1>Modular React App</h1>
+      </motion.header>
+      <Greeting name="Modern Developer" />
+      <div className="row mt-4">
+        {}
+        <div className="col-md-6 mb-3">
+          <div className="p-3 bg-light border rounded">
+            <p>Current count: <strong>{count}</strong></p>
+            <DisplayCount countValue={count} />
+            <button 
+              onClick={() => setCount(count + 1)} 
+              className="btn btn-success"
+            >
+              Increment
+            </button>
+          </div>
+        </div>
+        {}
+        <div className="col-md-6 mb-3">
+          <div className="p-3 bg-warning border rounded">
+            <h4>Animation Toggle</h4>
+            <button 
+              onClick={() => setIsVisible(!isVisible)} 
+              className="btn btn-secondary"
+            >
+              {isVisible ? 'Hide' : 'Show'}
+            </button>
+            <ToggleContent isVisible={isVisible} />
+          </div>
+        </div>
+        {}
+        <div className="col-12">
+          <TodoList items={todos} />
+        </div>
+      </div>
+    </div>
+  );
+}
+export default Parent;

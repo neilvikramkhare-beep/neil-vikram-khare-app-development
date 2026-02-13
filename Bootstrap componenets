@@ -1,0 +1,299 @@
+//App.js
+import React, { useState } from 'react';
+import UserCard from './UserCard';
+function App() {
+  const [user, setUser] = useState({ name: "John Rodhes", age: 35 });
+  const updateAge = () => {
+    setUser({ ...user, age: user.age + 1 });
+  };
+  return (
+    <div className="container">
+      <h2 className="text-center">
+        React Props and State Example
+      </h2>
+      <UserCard userName={user.name} userAge={user.age} />
+      <div className="text-center">
+        <button className="btn btn-primary" onClick={updateAge}>
+          Increase Age
+        </button>
+      </div>
+    </div>
+  );
+}
+export default App;
+//Footer.js
+import React from "react";
+function Footer()
+ {
+  return (
+    <footer className="App-footer">
+      <p>© 2026 My React App</p>
+    </footer>
+  );
+}
+export default Footer;
+//Header.js
+import React from "react";
+function Header() {
+  return (
+    <header className="App-header">
+      <h2>Welcome to the App</h2>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+  );
+}
+export default Header;
+//Modified app.js
+import React from "react";
+import Counter from "./Counter";
+import "./App.css"; 
+function App() {
+  return (
+    <div className="App">
+      <h1>Parent Component</h1>
+      <Counter />
+    </div>
+  );
+}
+export default App;
+//ParentComponent.js
+import React from "react";
+import Counter from "./Counter";
+function App()
+ {
+  return (
+    <div className="App">
+      <h1>Parent Component</h1>
+      <p>The parent component of the app is as shown here.</p>
+      <Counter />
+    </div>
+  );
+}
+export default App;
+//UserCard.js
+import React from "react";
+function UserCard({ Fname, age }) {
+  return (
+      <div className="card-body">
+        <h5 className="card-title text-primary">User Profile</h5>
+        <p className="card-text">
+          <strong>Name:</strong> {Fname}
+        </p>
+        {}
+        <AgeDisplay currentAge={age} />
+      </div>
+    </div>
+  );
+}
+export default UserCard;
+//Layout.bootstrap
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Bootstrap Basic Layout For Application</title>
+    <!-- Bootstrap CSS link -->
+    <link href="https://cdn.jsdelivr.net" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Layout</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pricing</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content Container -->
+    <div class="container mt-4">
+        <h1 class="mb-4">Welcome to the Bootstrap Layout</h1>
+        <!-- Card Row (using the grid system) -->
+        <div class="row g-4">
+            <!-- Card 1 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Header explaination</h5>
+                        <p class="card-text">In my header, I have explained what is our project about and our way to explore the application.</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Card Title 2</h5>
+                        <p class="card-text">This card is a content container that replaces old panels and wells in Bootstrap.</p>
+                        <a href="#" class="btn btn-success">Action</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Card Title 3</h5>
+                        <p class="card-text">Use buttons for actions like submitting forms or linking to other pages.</p>
+                        <a href="#" class="btn btn-danger">Alert</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-light mt-5 p-4 text-center">
+        <p>&copy; 2026 My Website. All rights reserved.</p>
+    </footer>
+    <!-- Bootstrap JS link (optional, for navbar toggler and other JS components) -->
+    <script src="https://cdn.jsdelivr.net" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
+//App.py
+from flask import Flask, request, jsonify
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_cors import CORS
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import declarative_base, sessionmaker
+from config import Config
+from utils.scanner import scan_website
+from utils.risk_ai import ai_risk_analysis
+from utils.breach import check_breach
+import datetime
+app = Flask(__name__)
+app.config.from_object(Config)
+CORS(app)
+limiter = Limiter(get_remote_address, app=app, default_limits=["10 per minute"])
+engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+Base = declarative_base()
+class ScanLog(Base):
+    __tablename__ = "scan_logs"
+    id = Column(Integer, primary_key=True)
+    domain = Column(String)
+    score = Column(Integer)
+    severity = Column(String)
+    timestamp = Column(String)
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+def calculate_score(results):
+    score = 100
+    if not results["ssl_valid"]:
+        score -= 30
+    score -= len(results["missing_headers"]) * 5
+    score -= len(results["open_ports"]) * 3
+    return max(score, 0)
+def severity_level(score):
+    if score >= 80: return "Low"
+    if score >= 60: return "Medium"
+    if score >= 40: return "High"
+    return "Critical"
+@app.route("/scan", methods=["POST"])
+@limiter.limit("5 per minute")
+def scan():
+    data = request.get_json()
+    url = data.get("url")
+    if not url:
+        return jsonify({"error": "URL required"}), 400
+    results = scan_website(url)
+    breach_report = check_breach(url)
+    score = calculate_score(results)
+    severity = severity_level(score)
+    ai_analysis = ai_risk_analysis(results)
+    session = Session()
+    log = ScanLog(
+        domain=url,
+        score=score,
+        severity=severity,
+        timestamp=str(datetime.datetime.utcnow())
+    )
+    session.add(log)
+    session.commit()
+    session.close()
+    return jsonify({
+        "score": score,
+        "severity": severity,
+        "site_result": str(results),
+        "report": breach_report,
+        "ai_analysis": ai_analysis
+    })
+@app.route("/analytics")
+def analytics():
+    session = Session()
+    logs = session.query(ScanLog).all()
+    session.close()
+    data = [{
+        "domain": l.domain,
+        "score": l.score,
+        "severity": l.severity,
+        "timestamp": l.timestamp
+    } for l in logs]
+    return jsonify(data)
+if __name__ == "__main__":
+    app.run()
+//App.js
+import React from "react";
+import Counter from "./Counter";
+import Header from "./Header";
+import Footer from "./Footer"; 
+function App() {
+  return (
+    <div className="App">
+      <Header /> {}
+      <h1>Parent Component</h1>
+      <Counter />
+      <Footer /> {}
+    </div>
+  );
+}
+export default App;
+//App.css
+.App {
+  background-color: #f0f0f0; 
+  background-image: url('path/to/your/image.jpg'); 
+        background-size: cover; 
+        background-position: center; 
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box; 
+}
+//App.Display.js
+import React from "react";
+function AgeDisplay({ currentAge }) {
+  const category = currentAge >= 18 ? "Adult" : "Minor";
+  return (
+    <div className="mt-2">
+      <p className="card-text">
+        <strong>Age:</strong> {currentAge} years
+      </p>
+      <span className={`badge ${category === "Adult" ? "bg-success" : "bg-warning"}`}>
+        {category}
+      </div>
+    </div>
+  );
+}
+export default AgeDisplay;

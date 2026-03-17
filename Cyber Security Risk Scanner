@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Risk Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Orbitron', monospace;
+            background: url('data:image/jpeg;base64,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') no-repeat center center fixed;
+            background-size: cover;
+            color: #00ff9c;
+        }
+
+        .overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 0;
+        }
+
+        .grid-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(#00ff9c22 1px, transparent 1px),
+                linear-gradient(90deg, #00ff9c22 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: moveGrid 20s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes moveGrid {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(40px);
+            }
+        }
+
+        .scan-line {
+            position: fixed;
+            width: 100%;
+            height: 2px;
+            background: #00ff9c;
+            animation: scanMove 6s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes scanMove {
+            0% {
+                top: 0;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 3;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            margin: 20px auto;
+            width: 500px;
+            border-radius: 10px;
+            border: 1px solid #00ff9c;
+        }
+
+        input,
+        button,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: black;
+            color: #00ff9c;
+            border: 1px solid #00ff9c;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        pre {
+            background: #000;
+            padding: 10px;
+            border: 1px solid #00ff9c;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div class="grid-bg"></div>
+    <div class="scan-line"></div>
+    <div class="container">
+        <h2>Login</h2>
+        <form>
+            <input type="text" placeholder="Username" required>
+            <input type="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <p style="position:relative;z-index:3;padding:20px;">
+    <div class="container">
+        <h2>System Vulnerability Scanner</h2>
+        <p> A vulnerability assessment is a systematic process of identifying, quantifying, and prioritizing the
+            security
+            vulnerabilities in an information system.
+            A cyber vulnerability is a weakness in an IT system, process, or internal control that can be exploited by
+            attackers to gain unauthorized access, steal data, or disrupt operations.
+            These flaws—ranging from software bugs and poor passwords to misconfigured networks—are the entry points for
+            malware, ransomware, and data breaches.A system vulnerability scanner is a tool that scans a system for
+            vulnerabilities and threats.
+            It analyzes the system to determine if there are any vulnerabilities or threats that need to be addressed.
+        </p>
+        <input id="targetInput" placeholder="Enter IP or URL">
+        <button onclick="scanSystem()">Scan</button>
+        <pre id="systemResult"></pre>
+    </div>
+    <div class="container">
+        <h2>URL Scanner</h2>
+        <p>A URL scanner is a tool that checks a website for malicious content, such as malware, phishing scams, or
+            other security threats.
+            It analyzes the website's code, links, and behavior to determine if it is safe to visit.</p>
+        <input id="urlInput" placeholder="Enter URL">
+        <button onclick="scanUrl()">Scan</button>
+        <pre id="urlResult"></pre>
+    </div>
+    <div class="container">
+        <h2>Cybersecurity Scan Analysis</h2>
+        <p>Cybersecurity scan analysis is the process of examining the results of a security scan to identify
+            vulnerabilities and threats.
+            It involves analyzing the scan results to determine if there are any vulnerabilities or threats that need to
+            be addressed.</p>
+        <textarea id="scanData"></textarea>
+        <button onclick="analyzeRisk()">Analyze</button>
+        <pre id="analysisResult"></pre>
+    </div>
+    <div class="container">
+        <h2>Data Breach Checker</h2>
+        <p>A data breach checker is a tool that checks if your personal information has been exposed in a data breach.
+            It analyzes your personal information to determine if it has been exposed in a data breach.</p>
+        <input id="emailInput" placeholder="Enter email">
+        <button onclick="checkBreach()">Check</button>
+        <pre id="breachResult"></pre>
+    </div>
+    <div class="container">
+        <h2>Website Security Scanner</h2>
+        <p>A website security scanner is a tool that checks a website for malicious content, such as malware, phishing
+            scams, or other security threats.
+            It analyzes the website's code, links, and behavior to determine if it is safe to visit.</p>
+        <input id="websiteInput" placeholder="Enter website URL">
+        <button onclick="scanWebsite()">Scan</button>
+        <pre id="websiteResult"></pre>
+    </div>
+    <div class="container">
+        <h2>Network Scanner</h2>
+        <p>A network scanner is a tool that scans a network for active hosts and open ports.
+            It analyzes the network to determine if there are any vulnerabilities or threats that need to be addressed.
+        </p>
+        <input placeholder="192.168.1.0/24">
+        <button>Scan</button>
+    </div>
+    <script>
+        async function scanSystem() {
+            let target = document.getElementById("targetInput").value;
+            let res = document.getElementById("systemResult");
+            res.innerText = "Scanning...";
+            try {
+                let r = await fetch("http://localhost:5000/system-scan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ target })
+                });
+                res.innerText = JSON.stringify(await r.json(), null, 2);
+            } catch {
+                res.innerText = "Error";
+            }
+        }
+        async function scanUrl() {
+            let url = document.getElementById("urlInput").value;
+            let res = document.getElementById("urlResult");
+            res.innerText = "Scanning...";
+            try {
+                let r = await fetch("http://localhost:5000/scan", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url })
+                });
+                res.innerText = JSON.stringify(await r.json(), null, 2);
+            } catch {
+                res.innerText = "Error";
+            }
+        }
+        async function analyzeRisk() {
+            let data = document.getElementById("scanData").value;
+            let res = document.getElementById("analysisResult");
+            let r = await fetch("http://localhost:5000/analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ scan_data: data })
+            });
+            res.innerText = (await r.json()).analysis;
+        }
+        async function checkBreach() {
+            let email = document.getElementById("emailInput").value;
+            let res = document.getElementById("breachResult");
+            res.innerText = "Checking...";
+            try {
+                let r = await fetch("http://localhost:5000/breach-check", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+                res.innerText = JSON.stringify(await r.json(), null, 2);
+            } catch {
+                res.innerText = "Error";
+            }
+        }
+        async function scanWebsite() {
+            let url = document.getElementById("websiteInput").value;
+            let res = document.getElementById("websiteResult");
+            let r = await fetch("http://localhost:5000/scan", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url })
+            });
+            res.innerText = JSON.stringify(await r.json(), null, 2);
+        }
+    </script>
+</body>
+
+</html>

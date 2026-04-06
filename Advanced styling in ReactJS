@@ -1,0 +1,217 @@
+//index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>React Advanced Styling</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/styled-components/dist/styled-components.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #333;
+      }
+      h1 {
+        text-align: center;
+        color: white;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1000px;
+        margin: auto;
+        padding: 20px;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+      }
+      .card:hover {
+        transform: scale(1.03);
+      }
+      button {
+        margin-top: 10px;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      @media (max-width: 768px) {
+        .card {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎨 React Advanced Styling</h1>
+    <div id="root"></div>
+    <script type="text/babel">
+      const styled = window.styled;
+      const InlineStyleComponent = () => {
+        const [color, setColor] = React.useState("#4CAF50");
+        const boxStyle = {
+          backgroundColor: color,
+          color: "white",
+          padding: "20px",
+          margin: "20px 0",
+          borderRadius: "10px",
+          textAlign: "center",
+        };
+        return (
+          <div style={boxStyle}>
+            <h2>Inline Styling</h2>
+            {}
+            <p>
+              <b>Concept:</b> Styles are applied directly using JavaScript
+              objects.
+            </p>
+            {}
+            <button
+              onClick={() =>
+                setColor(color === "#4CAF50" ? "#2196F3" : "#4CAF50")
+              }
+            >
+              Change Color
+            </button>
+          </div>
+        );
+      };
+      const CSSModuleComponent = () => {
+        const [count, setCount] = React.useState(0);
+        return (
+          <div className="card" style={{ borderLeft: "6px solid #2196F3" }}>
+            <h2>CSS Module Style</h2>
+            {}
+            <p>
+              <b>Concept:</b> Scoped styling prevents conflicts between
+              components.
+            </p>
+            {}
+            <p>Button Click Count: {count}</p>
+            <button onClick={() => setCount(count + 1)}>Click Me</button>
+          </div>
+        );
+      };
+      const StyledBox = styled.div`
+        background: #ff5722;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin: 20px 0;
+        transition: 0.3s;
+        &:hover {
+          background: #e64a19;
+        }
+      `;
+      const StyledComponentDemo = () => {
+        const [text, setText] = React.useState("Styled Components");
+        return (
+          <StyledBox>
+            <h2>{text}</h2>
+            {}
+            <p>
+              <b>Concept:</b> Write CSS inside JavaScript using
+              styled-components.
+            </p>
+            {}
+            <button onClick={() => setText("Updated Styled Component!")}>
+              Update Text
+            </button>
+          </StyledBox>
+        );
+      };
+      const ResponsiveComponent = () => {
+        const [width, setWidth] = React.useState(window.innerWidth);
+        React.useEffect(() => {
+          const handleResize = () => setWidth(window.innerWidth);
+          window.addEventListener("resize", handleResize);
+          return () => window.removeEventListener("resize", handleResize);
+        }, []);
+        return (
+          <div className="card" style={{ borderLeft: "6px solid #9c27b0" }}>
+            <h2>Responsive Design</h2>
+            {}
+            <p>
+              <b>Concept:</b> UI adapts based on screen size.
+            </p>
+            {}
+            <p>Current Width: {width}px</p>
+            <p>{width < 768 ? "📱 Mobile View" : "💻 Desktop View"}</p>
+          </div>
+        );
+      };
+      function App() {
+        return (
+          <div className="container">
+            <InlineStyleComponent />
+            <CSSModuleComponent />
+            <StyledComponentDemo />
+            <ResponsiveComponent />
+          </div>
+        );
+      }
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
+//App.css
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+}
+//App.js
+import React from "react";
+import InlineStyleComponent from "./components/InlineStyleComponent";
+import CSSModuleComponent from "./components/CSSModuleComponent";
+import StyledComponentDemo from "./components/StyledComponent";
+import ResponsiveComponent from "./components/ResponsiveComponent";
+function App() {
+  return (
+    <div>
+      <h1 style={{ textAlign: "center" }}>React Advanced Styling</h1>
+
+      <InlineStyleComponent />
+      <CSSModuleComponent />
+      <StyledComponentDemo />
+      <ResponsiveComponent />
+    </div>
+  );
+}
+export default App;
+//index.js
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./App.css";
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+//InlineStyleComponent.js
+import React from "react";
+const InlineStyleComponent = () => {
+  const boxStyle = {
+    backgroundColor: "#4CAF50",
+    color: "white",
+    padding: "20px",
+    margin: "20px",
+    borderRadius: "10px",
+    textAlign: "center"
+  };
+  return (
+    <div style={boxStyle}>
+      <h2>Inline Styling</h2>
+      <p>This component uses inline styles.</p>
+    </div>
+  );
+};
+export default InlineStyleComponent;

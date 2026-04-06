@@ -1,0 +1,151 @@
+//App.js
+import React, { useEffect, useMemo, useCallback } from "https://esm.sh/react@18";
+import { createStore, applyMiddleware } from "https://esm.sh/redux@4.2.1";
+import { Provider, useDispatch, useSelector } from "https://esm.sh/react-redux@8.1.1";
+import thunk from "https://esm.sh/redux-thunk@2.4.2";
+const loggerMiddleware = (store) => (next) => (action) => {
+  console.log("Dispatching:", action);
+  const result = next(action);
+  console.log("Next State:", store.getState());
+  return result;
+};
+const initialState = {
+  loading: false,
+  users: [],
+  error: null,
+  selectedUser: null,
+};
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "FETCH_USERS_REQUEST":
+      return { ...state, loading: true };
+    case "FETCH_USERS_SUCCESS":
+      return { ...state, loading: false, users: action.payload };
+    case "FETCH_USERS_ERROR":
+      return { ...state, loading: false, error: action.payload };
+    case "SELECT_USER":
+      return { ...state, selectedUser: action.payload };
+    default:
+      return state;
+  }
+};
+const store = createStore(
+  reducer,
+  applyMiddleware(loggerMiddleware, thunk)
+);
+const fetchUsers = () => {
+  return async (dispatch) => {
+    dispatch({ type: "FETCH_USERS_REQUEST" });
+    try {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+      const data = await response.json();
+      dispatch({
+        type: "FETCH_USERS_SUCCESS",
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "FETCH_USERS_ERROR",
+        payload: error.message,
+      });
+    }
+  };
+};
+const Header = () => {
+  console.log("Header Rendered");
+  return <h1>Redux User Dashboard</h1>;
+};
+const Loader = () => {
+  console.log("Loader Rendered");
+  return <p>Loading users...</p>;
+};
+const ErrorMessage = ({ message }) => {
+  console.log("Error Rendered");
+  return <p style={{ color: "red" }}>Error: {message}</p>;
+};
+const UserItem = React.memo(({ user, onClick }) => {
+  console.log("UserItem Rendered:", user.name);
+  return (
+    <li onClick={() => onClick(user)} style={{ cursor: "pointer" }}>
+      {user.name}
+    </li>
+  );
+});
+const UserList = React.memo(({ users, onUserClick }) => {
+  console.log("UserList Rendered");
+  return (
+    <ul>
+      {users.map((user) => (
+        <UserItem
+          key={user.id}
+          user={user}
+          onClick={onUserClick}
+        />
+      ))}
+    </ul>
+  );
+});
+const UserDetails = ({ user }) => {
+  if (!user) return <p>Select a user</p>;
+  return (
+    <div style={{ marginTop: "20px" }}>
+      <h3>User Details</h3>
+      <p><b>Name:</b> {user.name}</p>
+      <p><b>Email:</b> {user.email}</p>
+      <p><b>Phone:</b> {user.phone}</p>
+    </div>
+  );
+};
+const MainApp = () => {
+  const dispatch = useDispatch();
+  const { loading, users, error, selectedUser } = useSelector((state) => state);
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+  const userCount = useMemo(() => {
+    console.log("Calculating user count...");
+    return users.length;
+  }, [users]);
+  const handleUserClick = useCallback((user) => {
+    dispatch({ type: "SELECT_USER", payload: user });
+  }, [dispatch]);
+  return (
+    <div style={{ padding: "20px" }}>
+      <Header />
+      {loading && <Loader />}
+      {error && <ErrorMessage message={error} />}
+      <h3>Total Users: {userCount}</h3>
+      <UserList users={users} onUserClick={handleUserClick} />
+      <UserDetails user={selectedUser} />
+    </div>
+  );
+};
+export default function App() {
+  return (
+    <Provider store={store}>
+      <MainApp />
+    </Provider>
+  );
+}
+//index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redux Thunk App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import React from "https://esm.sh/react@18";
+      import ReactDOM from "https://esm.sh/react-dom@18/client";
+      import App from "./App.js";
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(React.createElement(App));
+    </script>
+  </body>
+</html>

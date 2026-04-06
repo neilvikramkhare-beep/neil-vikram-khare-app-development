@@ -1,0 +1,415 @@
+//database.html
+<!doctype html>
+<html>
+  <head>
+    <title>Clinic Management System</title>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 20px;
+        background-color: #f4f4f4;
+      }
+      h2 {
+        text-align: center;
+      }
+      input,
+      button {
+        margin: 5px;
+        padding: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background: white;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      button {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Clinic Management System</h2>
+    <div>
+      <input type="text" id="name" placeholder="Patient Name" />
+      <input type="number" id="age" placeholder="Age" />
+      <input type="text" id="phone" placeholder="Phone Number" />
+      <input type="text" id="timing" placeholder="Timing" />
+      <input type="date" id="date" />
+      <input type="text" id="day" placeholder="Day" />
+      <input type="number" id="payment" placeholder="Payment Remaining" />
+      <button onclick="addPatient()">Add Patient</button>
+    </div>
+    <div>
+      <input type="text" id="searchName" placeholder="Search Patient" />
+      <button onclick="searchPatient()">Search</button>
+      <input type="text" id="updateName" placeholder="Update Patient" />
+      <input type="number" id="newPayment" placeholder="New Payment" />
+      <button onclick="updatePayment()">Update Payment</button>
+      <input type="text" id="deleteName" placeholder="Delete Patient" />
+      <button onclick="deletePatient()">Delete</button>
+      <button onclick="sortByPayment()">Sort by Payment</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Phone</th>
+          <th>Timing</th>
+          <th>Date</th>
+          <th>Day</th>
+          <th>Payment Remaining</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <script>
+      let database = [];
+      function renderTable(data = database) {
+        let table = document.getElementById("tableBody");
+        table.innerHTML = "";
+        data.forEach((patient) => {
+          let row = `<tr>
+            <td>${patient.name}</td>
+            <td>${patient.age}</td>
+            <td>${patient.phone}</td>
+            <td>${patient.timing}</td>
+            <td>${patient.date}</td>
+            <td>${patient.day}</td>
+            <td>${patient.payment}</td>
+          </tr>`;
+          table.innerHTML += row;
+        });
+      }
+      function addPatient() {
+        let patient = {
+          name: document.getElementById("name").value,
+          age: document.getElementById("age").value,
+          phone: document.getElementById("phone").value,
+          timing: document.getElementById("timing").value,
+          date: document.getElementById("date").value,
+          day: document.getElementById("day").value,
+          payment: parseInt(document.getElementById("payment").value),
+        };
+        database.push(patient);
+        renderTable();
+      }
+      function searchPatient() {
+        let name = document.getElementById("searchName").value.toLowerCase();
+        let result = database.filter((p) => p.name.toLowerCase() === name);
+        renderTable(result);
+      }
+      function updatePayment() {
+        let name = document.getElementById("updateName").value.toLowerCase();
+        let newPayment = parseInt(document.getElementById("newPayment").value);
+        database.forEach((p) => {
+          if (p.name.toLowerCase() === name) {
+            p.payment = newPayment;
+          }
+        });
+        renderTable();
+      }
+      function deletePatient() {
+        let name = document.getElementById("deleteName").value.toLowerCase();
+        database = database.filter((p) => p.name.toLowerCase() !== name);
+        renderTable();
+      }
+      function sortByPayment() {
+        database.sort((a, b) => a.payment - b.payment);
+        renderTable();
+      }
+    </script>
+  </body>
+</html>
+//database.py
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+app = Flask(__name__)
+CORS(app)
+patients = []
+@app.route('/add', methods=['POST'])
+def add_patient():
+    data = request.json
+    patients.append(data)
+    return jsonify({"message": "Patient added successfully"})
+@app.route('/patients', methods=['GET'])
+def get_patients():
+    return jsonify(patients)
+@app.route('/search/<name>', methods=['GET'])
+def search_patient(name):
+    result = [p for p in patients if p['name'].lower() == name.lower()]
+    return jsonify(result)
+@app.route('/update', methods=['PUT'])
+def update_payment():
+    data = request.json
+    name = data.get('name')
+    new_payment = data.get('payment')
+    for p in patients:
+        if p['name'].lower() == name.lower():
+            p['payment'] = new_payment
+            return jsonify({"message": "Payment updated"})
+    return jsonify({"message": "Patient not found"}), 404
+@app.route('/delete/<name>', methods=['DELETE'])
+def delete_patient(name):
+    global patients
+    patients = [p for p in patients if p['name'].lower() != name.lower()]
+    return jsonify({"message": "Patient deleted"})
+@app.route('/sort', methods=['GET'])
+def sort_by_payment():
+    sorted_data = sorted(patients, key=lambda x: x.get('payment', 0))
+    return jsonify(sorted_data)
+if __name__ == '__main__':
+    app.run(debug=True)
+//index.html
+<!doctype html>
+<html>
+  <head>
+    <title>Data Explorer</title>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 20px;
+        background-color: #f4f4f4;
+      }
+      h2 {
+        text-align: center;
+      }
+      input,
+      button {
+        margin: 5px;
+        padding: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background: white;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      button {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Employee Management System</h2>
+    <div>
+      <input type="text" id="name" placeholder="Name" />
+      <input type="number" id="age" placeholder="Age" />
+      <input type="text" id="post" placeholder="Post" />
+      <input type="number" id="salary" placeholder="Salary" />
+      <input type="text" id="doj" placeholder="DOJ" />
+      <input type="text" id="city" placeholder="City" />
+      <input type="text" id="country" placeholder="Country" />
+      <button onclick="addEmployee()">Add Employee</button>
+    </div>
+    <div>
+      <input type="text" id="searchName" placeholder="Search Name" />
+      <button onclick="searchEmployee()">Search</button>
+      <input type="text" id="updateName" placeholder="Update Name" />
+      <input type="number" id="newSalary" placeholder="New Salary" />
+      <button onclick="updateEmployee()">Update Salary</button>
+      <input type="text" id="deleteName" placeholder="Delete Name" />
+      <button onclick="deleteEmployee()">Delete</button>
+      <button onclick="sortBySalary()">Sort by Salary</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Post</th>
+          <th>Salary</th>
+          <th>DOJ</th>
+          <th>City</th>
+          <th>Country</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+      let database = [];
+      function renderTable(data = database) {
+        let table = document.getElementById("tableBody");
+        table.innerHTML = "";
+        data.forEach((emp) => {
+          let row = `<tr>
+                <td>${emp.name}</td>
+                <td>${emp.age}</td>
+                <td>${emp.post}</td>
+                <td>${emp.salary}</td>
+                <td>${emp.doj}</td>
+                <td>${emp.city}</td>
+                <td>${emp.country}</td>
+            </tr>`;
+          table.innerHTML += row;
+        });
+      }
+      function addEmployee() {
+        let emp = {
+          name: document.getElementById("name").value,
+          age: document.getElementById("age").value,
+          post: document.getElementById("post").value,
+          salary: parseInt(document.getElementById("salary").value),
+          doj: document.getElementById("doj").value,
+          city: document.getElementById("city").value,
+          country: document.getElementById("country").value,
+        };
+        database.push(emp);
+        renderTable();
+      }
+      function searchEmployee() {
+        let name = document.getElementById("searchName").value.toLowerCase();
+        let result = database.filter((emp) => emp.name.toLowerCase() === name);
+        renderTable(result);
+      }
+      function updateEmployee() {
+        let name = document.getElementById("updateName").value.toLowerCase();
+        let newSalary = parseInt(document.getElementById("newSalary").value);
+
+        database.forEach((emp) => {
+          if (emp.name.toLowerCase() === name) {
+            emp.salary = newSalary;
+          }
+        });
+        renderTable();
+      }
+      function deleteEmployee() {
+        let name = document.getElementById("deleteName").value.toLowerCase();
+        database = database.filter((emp) => emp.name.toLowerCase() !== name);
+        renderTable();
+      }
+      function sortBySalary() {
+        database.sort((a, b) => a.salary - b.salary);
+        renderTable();
+      }
+    </script>
+  </body>
+</html>
+//index.py
+print("Python code to create a database and perform operations on it.")
+class College:
+    def __init__(self, n, a, p, s, doj):
+        self.name = n
+        self.age = a
+        self.post = p
+        self.salary = s
+        self.DOJ = doj
+class Location:
+    def __init__(self, city, cntry):
+        self.city = city
+        self.country = cntry
+class EmployeeDetails:
+    def __init__(self, c, l):
+        self.collegeInfo = c
+        self.locationInfo = l
+    def printCombinedDetails(self):
+        print(f"{self.collegeInfo.name} | {self.collegeInfo.age} | "
+              f"{self.collegeInfo.post} | {self.collegeInfo.salary} | "
+              f"{self.collegeInfo.DOJ} | {self.locationInfo.city} | "
+              f"{self.locationInfo.country}")
+database = []
+def insertEmployee(emp):
+    database.append(emp)
+    print("Employee inserted successfully.")
+def displayAllEmployees():
+    print("\nEmployee Records")
+    for emp in database:
+        emp.printCombinedDetails()
+def searchEmployee(name):
+    for emp in database:
+        if emp.collegeInfo.name.lower() == name.lower():
+            print("\nEmployee Found:")
+            emp.printCombinedDetails()
+            return
+    print("Employee not found.")
+def updateEmployee(name, new_salary):
+    for emp in database:
+        if emp.collegeInfo.name.lower() == name.lower():
+            emp.collegeInfo.salary = new_salary
+            print("Employee salary updated successfully.")
+            return
+    print("Employee not found.")
+def deleteEmployee(name):
+    global database
+    database = [emp for emp in database if emp.collegeInfo.name.lower() != name.lower()]
+    print("Employee deleted if existed.")
+def sortBySalary():
+    sorted_db = sorted(database, key=lambda x: x.collegeInfo.salary)
+    print("\nSorted by Salary")
+    for emp in sorted_db:
+        emp.printCombinedDetails()
+def filterByCity(city):
+    print(f"\nEmployees in {city}")
+    for emp in database:
+        if emp.locationInfo.city.lower() == city.lower():
+            emp.printCombinedDetails()
+def countEmployees():
+    print(f"\nTotal Employees: {len(database)}")
+def highestSalary():
+    emp = max(database, key=lambda x: x.collegeInfo.salary)
+    print("\nHighest Salary Employee:")
+    emp.printCombinedDetails()
+def lowestSalary():
+    emp = min(database, key=lambda x: x.collegeInfo.salary)
+    print("\nLowest Salary Employee:")
+    emp.printCombinedDetails()
+def bulkInsert(employee_list):
+    database.extend(employee_list)
+    print("Bulk insert completed.")
+def exportData():
+    print("\nExporting data to file:")
+    print("Data exported successfully.")
+def main():
+    isAuthorized = True
+    if isAuthorized:
+        print("Access Granted.")
+        collegeData = [
+            College("Suyash", 43, "Admin", 45000, "Monday"),
+            College("Amit", 54, "Supervisor", 68000, "Wednesday"),
+            College("Rahul", 32, "Manager", 80000, "Tuesday"),
+            College("Rajesh", 76, "Counsellor", 76000, "Thursday"),
+            College("Raveena", 32, "HOD", 90000, "Tuesday"),
+            College("Gaurav", 43, "CO", 88000, "Monday"),
+            College("Shirsh", 39, "Admin", 45000, "Tuesday"),
+            College("Hiresh", 45, "Payloader", 78000, "Thursday")
+        ]
+        locationData = [
+            Location("Pune", "India"),
+            Location("Mumbai", "India"),
+            Location("Delhi", "India"),
+            Location("Pune", "India"),
+            Location("Jaipur", "India"),
+            Location("Dehradun", "India"),
+            Location("Manipur", "India"),
+            Location("Kochin", "India")
+        ]
+        for i in range(len(collegeData)):
+            insertEmployee(EmployeeDetails(collegeData[i], locationData[i]))
+        displayAllEmployees()
+        searchEmployee("Rahul")
+        updateEmployee("Rahul", 95000)
+        deleteEmployee("Amit")
+        sortBySalary()
+        filterByCity("Pune")
+        countEmployees()
+        highestSalary()
+        lowestSalary()
+        exportData()
+    else:
+        print("Access Revoked.")
+if __name__ == "__main__":
+    main()

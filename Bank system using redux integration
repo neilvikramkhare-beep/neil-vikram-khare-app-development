@@ -1,0 +1,199 @@
+//App.js
+const { createStore } = Redux;
+const initialState = {
+  balance: 0,
+};
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'DEPOSIT':
+      return {
+        ...state,
+        balance: state.balance + action.payload,
+      };
+    case 'WITHDRAW':
+      if (state.balance >= action.payload) {
+        return {
+          ...state,
+          balance: state.balance - action.payload,
+        };
+      }
+      return state;
+    default:
+      return state;
+  }
+};
+const store = createStore(reducer);
+console.log("Initial state:", store.getState());
+store.subscribe(() => {
+  console.log("State updated:", store.getState());
+});
+console.log("\nDispatching DEPOSIT of 100");
+store.dispatch({ type: 'DEPOSIT', payload: 100 });
+console.log("\nDispatching WITHDRAW of 30");
+store.dispatch({ type: 'WITHDRAW', payload: 30 });
+console.log("\nDispatching WITHDRAW of 100");
+store.dispatch({ type: 'WITHDRAW', payload: 100 });
+console.log("\nDispatching DEPOSIT of 50");
+store.dispatch({ type: 'DEPOSIT', payload: 50 });
+//index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redux Bank App</title>
+    <script src="https://unpkg.com/redux@4.2.1/dist/redux.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        width: 300px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+      h1 {
+        margin-bottom: 10px;
+      }
+      .balance {
+        font-size: 28px;
+        margin: 20px 0;
+        color: #333;
+      }
+      input {
+        width: 80%;
+        padding: 8px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        text-align: center;
+      }
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        color: white;
+      }
+      .deposit {
+        background-color: #28a745;
+      }
+      .withdraw {
+        background-color: #dc3545;
+      }
+      button:hover {
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>💰 Bank App</h1>
+      <div class="balance" id="balance">₹0</div>
+      <input type="number" id="amount" placeholder="Enter amount" />
+      <div>
+        <button class="deposit" onclick="deposit()">Deposit</button>
+        <button class="withdraw" onclick="withdraw()">Withdraw</button>
+      </div>
+    </div>
+    <script>
+      const { createStore } = Redux;
+      const initialState = {
+        balance: 0,
+      };
+      const reducer = (state = initialState, action) => {
+        switch (action.type) {
+          case "DEPOSIT":
+            return {
+              ...state,
+              balance: state.balance + action.payload,
+            };
+          case "WITHDRAW":
+            if (state.balance >= action.payload) {
+              return {
+                ...state,
+                balance: state.balance - action.payload,
+              };
+            } else {
+              alert("Insufficient Balance!");
+              return state;
+            }
+          default:
+            return state;
+        }
+      };
+      const store = createStore(reducer);
+      function render() {
+        document.getElementById("balance").innerText =
+          "₹" + store.getState().balance;
+      }
+      render();
+      store.subscribe(render);
+      function deposit() {
+        const amount = Number(document.getElementById("amount").value);
+        if (amount > 0) {
+          store.dispatch({ type: "DEPOSIT", payload: amount });
+        }
+      }
+      function withdraw() {
+        const amount = Number(document.getElementById("amount").value);
+        if (amount > 0) {
+          store.dispatch({ type: "WITHDRAW", payload: amount });
+        }
+      }
+    </script>
+  </body>
+</html>
+//index.js
+import store from './store.js';
+console.log("Initial state:", store.getState());
+store.subscribe(() => {
+  console.log("State updated:", store.getState());
+});
+console.log("\nDispatching DEPOSIT of 100");
+store.dispatch({ type: 'DEPOSIT', payload: 100 });
+console.log("\nDispatching WITHDRAW of 30");
+store.dispatch({ type: 'WITHDRAW', payload: 30 });
+console.log("\nDispatching WITHDRAW of 100");
+store.dispatch({ type: 'WITHDRAW', payload: 100 });
+console.log("\nDispatching DEPOSIT of 50");
+store.dispatch({ type: 'DEPOSIT', payload: 50 });
+//reducer.js
+const initialState = {
+  balance: 0,
+};
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'DEPOSIT':
+      return {
+        ...state,
+        balance: state.balance + action.payload,
+      };
+    case 'WITHDRAW':
+      if (state.balance >= action.payload) {
+        return {
+          ...state,
+          balance: state.balance - action.payload,
+        };
+      }
+      return state; 
+    default:
+      return state;
+  }
+};
+export default reducer;
+//store.js
+import { createStore } from 'redux';
+import reducer from './reducer.js';
+const store = createStore(reducer);
+export default store;

@@ -1,710 +1,514 @@
-//index.html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>NeilOS</title>
-
-<style>
+//style.css
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    color: white;
-    overflow: hidden;
-    height: 100vh;
+  height: 100vh;
+  font-family: "Segoe UI";
+  background: linear-gradient(135deg, #0f172a, #1e3a8a);
+  color: #e2e8f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* ── Animated background canvas ── */
-#bgCanvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
+.container {
+  width: 90%;
+  max-width: 800px;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 20px;
+  padding: 30px;
 }
 
-/* Gradient overlay on top of canvas */
-.bg-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(ellipse at 30% 20%, rgba(56,189,248,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 80%, rgba(139,92,246,0.10) 0%, transparent 50%);
-    z-index: 1;
-    pointer-events: none;
+h1 {
+  text-align: center;
+  color: #60a5fa;
 }
 
-/* Desktop */
-.desktop {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-wrap: wrap;
-    padding: 30px;
-    gap: 24px;
-    align-content: flex-start;
-    height: calc(100vh - 56px);
+.input-group {
+  margin-bottom: 20px;
 }
 
-/* Icons */
-.icon {
-    width: 80px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s, filter 0.2s;
-    user-select: none;
-}
-.icon:hover {
-    transform: translateY(-4px) scale(1.08);
-    filter: drop-shadow(0 4px 12px rgba(56,189,248,0.45));
-}
-.icon div {
-    font-size: 42px;
-}
-.icon span {
-    display: block;
-    margin-top: 6px;
-    font-size: 12px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
-}
-
-/* Window */
-.window {
-    position: absolute;
-    top: 100px;
-    left: 100px;
-    width: 320px;
-    background: rgba(30,41,59,0.85);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    display: none;
-    padding: 14px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
-    z-index: 10;
-}
-.window header {
-    font-weight: bold;
-    margin-bottom: 10px;
-    cursor: move;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-input, button {
-    width: 100%;
-    margin: 5px 0;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: none;
-    font-size: 13px;
-    box-sizing: border-box;
-}
 input {
-    background: rgba(15,23,42,0.7);
-    color: #e2e8f0;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-input:focus {
-    outline: none;
-    border-color: #38bdf8;
-    box-shadow: 0 0 0 2px rgba(56,189,248,0.25);
-}
-button {
-    background: linear-gradient(135deg, #38bdf8, #818cf8);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.15s;
-}
-button:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-button:active {
-    transform: translateY(0);
-}
-pre {
-    background: rgba(0,0,0,0.5);
-    padding: 8px;
-    height: 100px;
-    overflow: auto;
-    border-radius: 6px;
-    font-size: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: #1e293b;
+  color: white;
+  border: none;
 }
 
-/* ── Taskbar ── */
-.taskbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 48px;
-    background: rgba(15,23,42,0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid rgba(255,255,255,0.08);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 0 16px;
+.btn {
+  width: 100%;
+  padding: 14px;
+  background: #2563eb;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
 }
-.taskbar-clock {
-    position: absolute;
-    right: 18px;
-    font-size: 12px;
-    color: #94a3b8;
-}
-.taskbar-btn {
-    width: auto;
-    padding: 4px 14px;
-    margin: 0;
-    font-size: 18px;
-    background: transparent;
-    border-radius: 8px;
-    transition: background 0.2s;
-    cursor: pointer;
-}
-.taskbar-btn:hover {
-    background: rgba(255,255,255,0.1);
-    transform: none;
-}
-</style>
-</head>
+//server.sql
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT
+);
 
-<body>
+CREATE TABLE bank ( id INTEGER PRIMARY KEY, balance REAL );
 
-<canvas id="bgCanvas"></canvas>
-<div class="bg-overlay"></div>
+INSERT INTO bank VALUES (1, 1000);
 
+CREATE TABLE messages (message TEXT);
 
-<div class="desktop">
+CREATE TABLE employees (name TEXT, salary REAL);
 
-<div class="icon" onclick="openApp('auth')">
-    <div>🔐</div><span>Auth</span>
-</div>
-
-<div class="icon" onclick="openApp('patient')">
-    <div>🧑‍⚕️</div><span>Patient</span>
-</div>
-
-<div class="icon" onclick="openApp('bank')">
-    <div>🏦</div><span>Bank</span>
-</div>
-
-<div class="icon" onclick="openApp('employee')">
-    <div>👨‍💼</div><span>Employee</span>
-</div>
-
-<div class="icon" onclick="openApp('chat')">
-    <div>💬</div><span>Chat</span>
-</div>
-
-<div class="icon" onclick="openApp('search')">
-    <div>🔎</div><span>Search</span>
-</div>
-
-</div>
-
-<!-- AUTH -->
-<div class="window" id="auth">
-<header>Login</header>
-<input id="user" placeholder="Username">
-<input id="pass" placeholder="Password" type="password">
-<button onclick="register()">Register</button>
-<button onclick="login()">Login</button>
-<pre id="authRes"></pre>
-</div>
-
-<!-- PATIENT -->
-<div class="window" id="patient">
-<header>KhareDentalHome</header>
-<input id="patientData" placeholder='{"name":"John"}'>
-<button onclick="savePatient()">Save</button>
-<pre id="patientRes"></pre>
-</div>
-
-<!-- BANK -->
-<div class="window" id="bank">
-<header>Bank</header>
-<input id="amount" placeholder="Amount">
-<button onclick="getBalance()">Balance</button>
-<button onclick="deposit()">Deposit</button>
-<button onclick="withdraw()">Withdraw</button>
-<pre id="bankRes"></pre>
-</div>
-
-<!-- EMPLOYEE -->
-<div class="window" id="employee">
-<header>DBMS</header>
-<input id="empName" placeholder="Name">
-<input id="empSalary" placeholder="Salary">
-<button onclick="addEmployee()">Add</button>
-<button onclick="getEmployees()">View</button>
-<pre id="empRes"></pre>
-</div>
-
-<!-- CHAT -->
-<div class="window" id="chat">
-<header>Chat</header>
-<input id="chatMsg">
-<button onclick="sendMsg()">Send</button>
-<button onclick="getMsgs()">Load</button>
-<pre id="chatRes"></pre>
-</div>
-
-<!-- SEARCH -->
-<div class="window" id="search">
-<header>Search</header>
-<input id="searchQ">
-<button onclick="search()">Go</button>
-<pre id="searchRes"></pre>
-</div>
-
-<script>
-const API = "http://localhost:5002";
-
-// Open App
-function openApp(id) {
-    document.querySelectorAll(".window").forEach(w => w.style.display = "none");
-    document.getElementById(id).style.display = "block";
-}
-
-// AUTH
-async function register() {
-    let res = await fetch(API+"/register", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({username:user.value,password:pass.value})
-    });
-    authRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-async function login() {
-    let res = await fetch(API+"/login", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({username:user.value,password:pass.value})
-    });
-    authRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-// PATIENT
-async function savePatient() {
-    let res = await fetch(API+"/patient", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: patientData.value
-    });
-    patientRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-// BANK
-async function getBalance() {
-    let res = await fetch(API+"/balance");
-    bankRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-async function deposit() {
-    let res = await fetch(API+"/deposit", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({amount:amount.value})
-    });
-    bankRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-async function withdraw() {
-    let res = await fetch(API+"/withdraw", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({amount:amount.value})
-    });
-    bankRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-// EMPLOYEE
-async function addEmployee() {
-    let res = await fetch(API+"/employee/add", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({name:empName.value,salary:empSalary.value})
-    });
-    empRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-async function getEmployees() {
-    let res = await fetch(API+"/employee");
-    empRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-// CHAT
-async function sendMsg() {
-    let res = await fetch(API+"/chat", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({message:chatMsg.value})
-    });
-    chatRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-async function getMsgs() {
-    let res = await fetch(API+"/chat");
-    chatRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-// SEARCH
-async function search() {
-    let res = await fetch(API+"/search?q="+searchQ.value);
-    searchRes.innerText = JSON.stringify(await res.json(), null, 2);
-}
-
-/* ── BLAST Background Animation ── */
-(function() {
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    let w, h;
-
-    function resize() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    /* ── Colour palette ── */
-    const COLORS = [
-        [56,189,248],   // sky blue
-        [139,92,246],   // violet
-        [236,72,153],   // pink
-        [251,191,36],   // amber
-        [52,211,153],   // emerald
-        [255,255,255],  // white
-    ];
-
-    /* ── Blast (burst) particles ── */
-    const BURST_COUNT = 260;
-    const burstParticles = [];
-    const cx = () => w / 2;
-    const cy = () => h / 2;
-
-    for (let i = 0; i < BURST_COUNT; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 2 + Math.random() * 10;
-        const c = COLORS[Math.floor(Math.random() * COLORS.length)];
-        burstParticles.push({
-            x: cx(), y: cy(),
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            r: Math.random() * 3 + 1,
-            color: c,
-            alpha: 1,
-            decay: 0.003 + Math.random() * 0.006,
-            trail: []
-        });
-    }
-
-    /* ── Shockwave ring ── */
-    let shockRadius = 0;
-    let shockAlpha = 1.2;
-    const SHOCK_SPEED = 8;
-
-    /* ── Screen flash ── */
-    let flashAlpha = 1.0;
-
-    /* ── Ambient (post-blast) particles ── */
-    const ambientParticles = [];
-    function seedAmbient() {
-        const count = Math.floor((w * h) / 3500);
-        ambientParticles.length = 0;
-        for (let i = 0; i < count; i++) {
-            const c = COLORS[Math.floor(Math.random() * COLORS.length)];
-            ambientParticles.push({
-                x: Math.random() * w,
-                y: Math.random() * h,
-                r: Math.random() * 1.6 + 0.3,
-                dx: (Math.random() - 0.5) * 0.25,
-                dy: (Math.random() - 0.5) * 0.12,
-                color: c,
-                alpha: 0,                        // fade-in after blast
-                targetAlpha: Math.random() * 0.5 + 0.15,
-                pulse: Math.random() * Math.PI * 2
-            });
-        }
-    }
-    seedAmbient();
-    window.addEventListener('resize', seedAmbient);
-
-    /* ── Nebula glow spots ── */
-    const glows = [
-        { x: 0.25, y: 0.3, rFactor: 0.35, color: '56,189,248', alpha: 0 },
-        { x: 0.75, y: 0.7, rFactor: 0.30, color: '139,92,246', alpha: 0 },
-        { x: 0.5,  y: 0.5, rFactor: 0.50, color: '236,72,153', alpha: 0 }
-    ];
-
-    /* ── Timing ── */
-    const startTime = performance.now();
-    const BLAST_DURATION = 3500;  // ms the blast fully plays
-
-    /* ── Main draw loop ── */
-    function draw() {
-        const elapsed = performance.now() - startTime;
-        const blastProgress = Math.min(elapsed / BLAST_DURATION, 1); // 0 → 1
-
-        /* — background — */
-        const grad = ctx.createLinearGradient(0, 0, w, h);
-        grad.addColorStop(0, '#070b14');
-        grad.addColorStop(0.5, '#0f172a');
-        grad.addColorStop(1, '#070b14');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, w, h);
-
-        /* — nebula glows (fade in after blast) — */
-        for (const g of glows) {
-            g.alpha += (0.08 - g.alpha) * 0.005;
-            const rg = ctx.createRadialGradient(
-                g.x * w, g.y * h, 0,
-                g.x * w, g.y * h, g.rFactor * Math.max(w, h)
-            );
-            rg.addColorStop(0, `rgba(${g.color},${g.alpha})`);
-            rg.addColorStop(1, 'transparent');
-            ctx.fillStyle = rg;
-            ctx.fillRect(0, 0, w, h);
-        }
-
-        /* — Ambient particles (fade-in gently after blast settles) — */
-        for (const p of ambientParticles) {
-            if (blastProgress > 0.4) {
-                p.alpha += (p.targetAlpha - p.alpha) * 0.01;
-            }
-            p.pulse += 0.008;
-            const flicker = 0.6 + 0.4 * Math.sin(p.pulse);
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${p.color[0]},${p.color[1]},${p.color[2]},${p.alpha * flicker})`;
-            ctx.fill();
-
-            p.x += p.dx;
-            p.y += p.dy;
-            if (p.x < -5) p.x = w + 5;
-            if (p.x > w + 5) p.x = -5;
-            if (p.y < -5) p.y = h + 5;
-            if (p.y > h + 5) p.y = -5;
-        }
-
-        /* — Burst particles (the main blast!) — */
-        if (blastProgress < 1) {
-            for (const bp of burstParticles) {
-                // Trail memory
-                bp.trail.push({ x: bp.x, y: bp.y, a: bp.alpha });
-                if (bp.trail.length > 12) bp.trail.shift();
-
-                // Draw trail
-                for (let t = 0; t < bp.trail.length; t++) {
-                    const seg = bp.trail[t];
-                    const ta = seg.a * (t / bp.trail.length) * 0.35;
-                    ctx.beginPath();
-                    ctx.arc(seg.x, seg.y, bp.r * 0.6, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${bp.color[0]},${bp.color[1]},${bp.color[2]},${ta})`;
-                    ctx.fill();
-                }
-
-                // Draw head
-                ctx.beginPath();
-                ctx.arc(bp.x, bp.y, bp.r, 0, Math.PI * 2);
-                const headGlow = ctx.createRadialGradient(bp.x, bp.y, 0, bp.x, bp.y, bp.r * 3);
-                headGlow.addColorStop(0, `rgba(${bp.color[0]},${bp.color[1]},${bp.color[2]},${bp.alpha})`);
-                headGlow.addColorStop(1, `rgba(${bp.color[0]},${bp.color[1]},${bp.color[2]},0)`);
-                ctx.fillStyle = headGlow;
-                ctx.fill();
-
-                // Physics
-                bp.x += bp.vx;
-                bp.y += bp.vy;
-                bp.vx *= 0.985;
-                bp.vy *= 0.985;
-                bp.alpha = Math.max(0, bp.alpha - bp.decay);
-            }
-        }
-
-        /* — Shockwave ring — */
-        if (shockAlpha > 0.01) {
-            shockRadius += SHOCK_SPEED;
-            shockAlpha *= 0.975;
-
-            ctx.beginPath();
-            ctx.arc(cx(), cy(), shockRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(160,210,255,${shockAlpha * 0.6})`;
-            ctx.lineWidth = 3 + shockAlpha * 6;
-            ctx.shadowColor = 'rgba(56,189,248,0.8)';
-            ctx.shadowBlur = 30 * shockAlpha;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-
-            // second ring (slightly behind)
-            if (shockRadius > 40) {
-                ctx.beginPath();
-                ctx.arc(cx(), cy(), shockRadius * 0.7, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(139,92,246,${shockAlpha * 0.35})`;
-                ctx.lineWidth = 2 + shockAlpha * 3;
-                ctx.stroke();
-            }
-        }
-
-        /* — Screen flash overlay — */
-        if (flashAlpha > 0.005) {
-            ctx.fillStyle = `rgba(200,225,255,${flashAlpha})`;
-            ctx.fillRect(0, 0, w, h);
-            flashAlpha *= 0.94;
-        }
-
-        /* — Central glow (epicentre) — */
-        if (blastProgress < 0.8) {
-            const gIntensity = Math.max(0, 1 - blastProgress * 1.5);
-            const cg = ctx.createRadialGradient(cx(), cy(), 0, cx(), cy(), 180);
-            cg.addColorStop(0, `rgba(255,255,255,${gIntensity * 0.6})`);
-            cg.addColorStop(0.3, `rgba(56,189,248,${gIntensity * 0.25})`);
-            cg.addColorStop(1, 'transparent');
-            ctx.fillStyle = cg;
-            ctx.fillRect(cx() - 200, cy() - 200, 400, 400);
-        }
-
-        requestAnimationFrame(draw);
-    }
-    draw();
-})();
-
-/* ── Taskbar Clock ── */
-(function() {
-    const clock = document.getElementById('taskbar-clock');
-    function tick() {
-        const d = new Date();
-        clock.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            + '  •  ' + d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-    tick();
-    setInterval(tick, 1000);
-})();
-</script>
-
-<!-- Taskbar -->
-<div class="taskbar">
-    <button class="taskbar-btn" onclick="openApp('auth')" title="Auth">🔐</button>
-    <button class="taskbar-btn" onclick="openApp('patient')" title="Patient">🧑‍⚕️</button>
-    <button class="taskbar-btn" onclick="openApp('bank')" title="Bank">🏦</button>
-    <button class="taskbar-btn" onclick="openApp('employee')" title="Employee">👨‍💼</button>
-    <button class="taskbar-btn" onclick="openApp('chat')" title="Chat">💬</button>
-    <button class="taskbar-btn" onclick="openApp('search')" title="Search">🔎</button>
-    <span class="taskbar-clock" id="taskbar-clock"></span>
-</div>
-
-</body>
-</html>
-#server.py
+CREATE TABLE patients (data TEXT);
+//server.py
 from flask import Flask, request, jsonify
 import sqlite3
-import requests
-from bs4 import BeautifulSoup
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
 def db():
     return sqlite3.connect("neilos.db")
 
+# -------- INIT DB --------
+def init():
+    conn = db()
+    conn.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, username TEXT, password TEXT)")
+    conn.execute("CREATE TABLE IF NOT EXISTS bank(id INTEGER PRIMARY KEY, balance REAL)")
+    conn.execute("CREATE TABLE IF NOT EXISTS messages(message TEXT)")
+    conn.execute("CREATE TABLE IF NOT EXISTS employees(name TEXT, salary REAL)")
+    conn.execute("CREATE TABLE IF NOT EXISTS patients(data TEXT)")
+    conn.execute("INSERT OR IGNORE INTO bank(id,balance) VALUES(1,1000)")
+    conn.commit()
+    conn.close()
+
+init()
+
 # -------- AUTH --------
 @app.route("/register", methods=["POST"])
 def register():
     d = request.json
     conn = db()
-    conn.execute("INSERT INTO users VALUES(NULL,?,?)", (d["username"], d["password"]))
+    conn.execute("INSERT INTO users(username,password) VALUES(?,?)",
+                 (d["username"], generate_password_hash(d["password"])))
     conn.commit()
+    conn.close()
     return jsonify(message="Registered")
 
 @app.route("/login", methods=["POST"])
 def login():
     d = request.json
-    cur = db().execute("SELECT password FROM users WHERE username=?", (d["username"],))
+    conn = db()
+    cur = conn.execute("SELECT password FROM users WHERE username=?", (d["username"],))
     row = cur.fetchone()
-    return jsonify(success=(row and row[0] == d["password"]))
-
-# -------- PATIENT --------
-@app.route("/patient", methods=["POST"])
-def patient():
-    d = request.json
-    db().execute("INSERT INTO patients(data) VALUES(?)", (str(d),))
-    db().commit()
-    return jsonify(message="Saved")
+    conn.close()
+    return jsonify(success=(row and check_password_hash(row[0], d["password"])))
 
 # -------- BANK --------
 @app.route("/balance")
 def balance():
-    cur = db().execute("SELECT balance FROM bank WHERE id=1")
-    return jsonify(balance=cur.fetchone()[0])
+    conn = db()
+    bal = conn.execute("SELECT balance FROM bank WHERE id=1").fetchone()[0]
+    conn.close()
+    return jsonify(balance=bal)
 
 @app.route("/deposit", methods=["POST"])
 def deposit():
     amt = float(request.json["amount"])
-    db().execute("UPDATE bank SET balance = balance + ?", (amt,))
-    db().commit()
+    conn = db()
+    conn.execute("UPDATE bank SET balance = balance + ?", (amt,))
+    conn.commit()
+    conn.close()
     return balance()
 
 @app.route("/withdraw", methods=["POST"])
 def withdraw():
     amt = float(request.json["amount"])
-    cur = db().execute("SELECT balance FROM bank WHERE id=1")
-    bal = cur.fetchone()[0]
-
+    conn = db()
+    bal = conn.execute("SELECT balance FROM bank WHERE id=1").fetchone()[0]
     if bal >= amt:
-        db().execute("UPDATE bank SET balance = balance - ?", (amt,))
-        db().commit()
-        return balance()
-    return jsonify(error="Insufficient")
-
-# -------- EMPLOYEE --------
-@app.route("/employee/add", methods=["POST"])
-def emp_add():
-    d = request.json
-    db().execute("INSERT INTO employees(name,salary,data) VALUES(?,?,?)",
-                 (d["name"], d["salary"], str(d)))
-    db().commit()
-    return jsonify(message="Added")
-
-@app.route("/employee")
-def emp_get():
-    cur = db().execute("SELECT name,salary FROM employees")
-    return jsonify([{"name":r[0],"salary":r[1]} for r in cur.fetchall()])
+        conn.execute("UPDATE bank SET balance = balance - ?", (amt,))
+        conn.commit()
+    conn.close()
+    return balance()
 
 # -------- CHAT --------
 @app.route("/chat", methods=["POST"])
 def chat():
     msg = request.json["message"]
-    db().execute("INSERT INTO messages(message) VALUES(?)", (msg,))
-    db().commit()
+    conn = db()
+    conn.execute("INSERT INTO messages VALUES(?)", (msg,))
+    conn.commit()
+    conn.close()
     return jsonify(message="Sent")
 
 @app.route("/chat")
 def get_chat():
-    cur = db().execute("SELECT message FROM messages")
-    return jsonify([r[0] for r in cur.fetchall()])
-
-# -------- SEARCH --------
-@app.route("/search")
-def search():
-    q = request.args.get("q")
-    html = requests.get("https://html.duckduckgo.com/html/?q="+q).text
-    soup = BeautifulSoup(html, "html.parser")
-
-    results = []
-    for a in soup.select(".result__a"):
-        results.append({"title": a.text, "link": a["href"]})
-
-    return jsonify(results)
+    conn = db()
+    data = [r[0] for r in conn.execute("SELECT message FROM messages")]
+    conn.close()
+    return jsonify(data)
 
 app.run(port=5002)
+//server.java
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+
+@RestController
+public class Backend {
+
+    Map<String,String> users = new HashMap<>();
+    double balance = 1000;
+    List<String> chat = new ArrayList<>();
+
+    @PostMapping("/register")
+    public Map<String,String> register(@RequestBody Map<String,String> d){
+        users.put(d.get("username"), d.get("password"));
+        return Map.of("message","Registered");
+    }
+
+    @PostMapping("/login")
+    public Map<String,Boolean> login(@RequestBody Map<String,String> d){
+        boolean ok = users.containsKey(d.get("username")) &&
+                     users.get(d.get("username")).equals(d.get("password"));
+        return Map.of("success", ok);
+    }
+
+    @GetMapping("/balance")
+    public Map<String,Double> balance(){
+        return Map.of("balance", balance);
+    }
+
+    @PostMapping("/deposit")
+    public Map<String,Double> deposit(@RequestBody Map<String,Double> d){
+        balance += d.get("amount");
+        return balance();
+    }
+
+    @PostMapping("/withdraw")
+    public Map<String,Double> withdraw(@RequestBody Map<String,Double> d){
+        if(balance >= d.get("amount")) balance -= d.get("amount");
+        return balance();
+    }
+
+    @PostMapping("/chat")
+    public Map<String,String> chat(@RequestBody Map<String,String> d){
+        chat.add(d.get("message"));
+        return Map.of("message","Sent");
+    }
+
+    @GetMapping("/chat")
+    public List<String> getChat(){
+        return chat;
+    }
+}
+//server.cpp
+#include "crow_all.h"
+#include <vector>
+#include <string>
+
+int main() {
+    crow::SimpleApp app;
+
+    double balance = 1000;
+    std::vector<std::string> chat;
+
+    CROW_ROUTE(app, "/balance")
+    ([](){
+        crow::json::wvalue x;
+        x["balance"] = 1000;
+        return x;
+    });
+
+    CROW_ROUTE(app, "/deposit").methods("POST"_method)
+    ([&balance](const crow::request& req){
+        auto data = crow::json::load(req.body);
+        balance += data["amount"].d();
+        crow::json::wvalue x;
+        x["balance"] = balance;
+        return x;
+    });
+
+    CROW_ROUTE(app, "/chat").methods("POST"_method)
+    ([&chat](const crow::request& req){
+        auto data = crow::json::load(req.body);
+        chat.push_back(data["message"].s());
+        return crow::response("Sent");
+    });
+
+    app.port(5002).multithreaded().run();
+}
+//run_all.ps1
+# NeilOS - Run All Servers
+Write-Host "Starting NeilOS servers..." -ForegroundColor Green
+
+# Start Python server
+Write-Host "Starting Python server on port 5002..." -ForegroundColor Cyan
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "python server.py"
+
+# Start Java server
+Write-Host "Compiling and starting Java server..." -ForegroundColor Cyan
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "javac server.java; java server"
+
+# Note: Compile C++ first with g++, then uncomment next line
+# Start-Process powershell -ArgumentList "-NoExit", "-Command", "./server.exe"
+
+Write-Host "`nAll servers started!" -ForegroundColor Green
+//run_all.bat
+@echo off
+echo Starting NeilOS servers...
+title NeilOS - Python Server
+start cmd /k "python server.py"
+
+title NeilOS - Java Server
+start cmd /k "javac server.java && java server"
+
+REM Note: Compile C++ first, then uncomment the next line:
+REM start cmd /k "server.exe"
+
+echo All servers started!
+pause
+//index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>NeilOS</title>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: "Segoe UI", sans-serif;
+        color: white;
+      }
+
+      /* 🌌 Background canvas */
+      #bg {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        background: radial-gradient(circle at center, #0f172a, #020617);
+      }
+
+      /* ✨ Glass overlay */
+      .overlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(40px);
+        background:
+          radial-gradient(
+            circle at 20% 30%,
+            rgba(56, 189, 248, 0.15),
+            transparent
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(139, 92, 246, 0.15),
+            transparent
+          );
+        z-index: 1;
+      }
+
+      /* 🖥 Desktop */
+      .desktop {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 30px;
+        gap: 25px;
+      }
+
+      /* 🧊 Icons */
+      .icon {
+        width: 80px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .icon:hover {
+        transform: scale(1.1) translateY(-5px);
+      }
+      .icon div {
+        font-size: 42px;
+      }
+      .icon span {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="bg"></canvas>
+    <div class="overlay"></div>
+
+    <!-- 🖥 Desktop Icons -->
+    <div class="desktop">
+      <div class="icon">
+        <div>🔐</div>
+        <span>Auth</span>
+      </div>
+      <div class="icon">
+        <div>🧑‍⚕️</div>
+        <span>Patient</span>
+      </div>
+      <div class="icon">
+        <div>🏦</div>
+        <span>Bank</span>
+      </div>
+      <div class="icon">
+        <div>👨‍💼</div>
+        <span>Employee</span>
+      </div>
+      <div class="icon">
+        <div>💬</div>
+        <span>Chat</span>
+      </div>
+      <div class="icon">
+        <div>🔎</div>
+        <span>Search</span>
+      </div>
+      <div class="icon">
+        <div>🧠</div>
+        <span>Math</span>
+      </div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("bg");
+      const ctx = canvas.getContext("2d");
+
+      let w, h;
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      /* 🌌 Floating particles */
+      const stars = [];
+      for (let i = 0; i < 120; i++) {
+        stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 1.5 + 0.5,
+          dx: (Math.random() - 0.5) * 0.3,
+          dy: (Math.random() - 0.5) * 0.3,
+        });
+      }
+
+      /* 🌊 Wave glow */
+      let t = 0;
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+
+        /* background gradient */
+        const g = ctx.createLinearGradient(0, 0, w, h);
+        g.addColorStop(0, "#020617");
+        g.addColorStop(1, "#0f172a");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        /* animated glow waves */
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          for (let x = 0; x < w; x += 10) {
+            let y = h / 2 + Math.sin(x * 0.01 + t + i) * 40;
+            ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `rgba(56,189,248,0.08)`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        /* particles */
+        stars.forEach((s) => {
+          s.x += s.dx;
+          s.y += s.dy;
+
+          if (s.x < 0 || s.x > w) s.dx *= -1;
+          if (s.y < 0 || s.y > h) s.dy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = "white";
+          ctx.fill();
+        });
+
+        t += 0.01;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    </script>
+  </body>
+</html>
+//server.sql
+-- Create Database
+CREATE DATABASE neilos;
+USE neilos;
+
+-- 🔐 Users (Auth)
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 🧑‍⚕️ Patients
+CREATE TABLE patients (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    disease VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 🏦 Bank Accounts
+CREATE TABLE bank_accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    balance DECIMAL(10,2) DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 💸 Transactions
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT,
+    amount DECIMAL(10,2),
+    type ENUM('deposit','withdraw'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES bank_accounts(id)
+);
+
+-- 👨‍💼 Employees
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    role VARCHAR(50),
+    salary DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 💬 Chat Messages
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50),
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 🧠 Math History
+CREATE TABLE math_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    expression TEXT,
+    result TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

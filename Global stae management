@@ -1,0 +1,265 @@
+//Consume.js
+import React, { useContext } from "react";
+import { ThemeContext } from "./ThemeContext";
+function Navbar() {
+    const { theme, toggleTheme } = useContext(ThemeContext);
+    return (
+        <div>
+            <p>Current Theme: {theme}</p>
+            <button onClick={toggleTheme}>Toggle Theme</button>
+        </div>
+    );
+}
+//Context.js
+import React, { createContext } from "react";
+export const ThemeContext = createContext();
+//ErrorBoundary.js
+import React from "react";
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+    static getDerivedStateFromError(error) {
+        return { hasError: true };
+    }
+    componentDidCatch(error, info) {
+        console.log("Error:", error);
+        console.log("Info:", info);
+    }
+    render() {
+        if (this.state.hasError) {
+            return <h2>Something went wrong.</h2>;
+        }
+        return this.props.children;
+    }
+}
+export default ErrorBoundary;
+//MouseeTracker.js
+import React, { useState } from "react";
+function MouseTracker({ render }) {
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const handleMouseMove = (event) => {
+        setPosition({
+            x: event.clientX,
+            y: event.clientY
+        });
+    };
+}
+export default MouseTracker;
+//ThemeProvider.js
+import React, { useState } from "react";
+import { ThemeContext } from "./ThemeContext";
+function ThemeProvider({ children }) {
+    const [theme, setTheme] = useState("light");
+    const toggleTheme = () => {
+        setTheme(theme === "light" ? "dark" : "light");
+    };
+    return (
+        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+            {children}
+        </ThemeContext.Provider>
+    );
+}
+export default ThemeProvider;
+//withAuth.js
+import React from "react";
+function withAuth(Component) {
+    return function AuthComponent(props) {
+        const isAuthenticated = true;
+        if (!isAuthenticated) {
+            return <h2>Please login</h2>;
+        }
+        return <Component {...props} />;
+    };
+}
+export default withAuth;
+//index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>React Advanced Concepts Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- React + Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(120deg, #89f7fe, #66a6ff);
+            min-height: 100vh;
+            font-family: Arial;
+        }
+
+        .card {
+            border-radius: 15px;
+        }
+
+        .login-box {
+            max-width: 400px;
+            margin: auto;
+            margin-top: 100px;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+        const { useState, useContext, createContext } = React;
+
+        // Context
+        const ThemeContext = createContext();
+
+        // Theme Provider
+        function ThemeProvider({ children }) {
+            const [theme, setTheme] = useState("light");
+            const toggleTheme = () => {
+                setTheme(theme === "light" ? "dark" : "light");
+            };
+            return (
+                <ThemeContext.Provider value={{ theme, toggleTheme }}>
+                    {children}
+                </ThemeContext.Provider>
+            );
+        }
+
+        // Navbar (useContext)
+        function Navbar() {
+            const { theme, toggleTheme } = useContext(ThemeContext);
+            return (
+                <div className="card p-3 mb-3">
+                    <h5>Context API Section</h5>
+                    <p>Current Theme: {theme}</p>
+                    <button className="btn btn-primary" onClick={toggleTheme}>Toggle Theme</button>
+                </div>
+            );
+        }
+
+        // Error Boundary
+        class ErrorBoundary extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false };
+            }
+            static getDerivedStateFromError() {
+                return { hasError: true };
+            }
+            componentDidCatch(error, info) {
+                console.log(error, info);
+            }
+            render() {
+                if (this.state.hasError) {
+                    return <h4>Error occurred!</h4>;
+                }
+                return this.props.children;
+            }
+        }
+
+        // HOC
+        function withAuth(Component) {
+            return function AuthComponent(props) {
+                const isAuthenticated = true;
+                if (!isAuthenticated) {
+                    return <h4>Please login</h4>;
+                }
+                return <Component {...props} />;
+            };
+        }
+
+        // Protected Component
+        function SecretPage() {
+            return <div className="card p-3">🔒 Protected Content (HOC)</div>;
+        }
+
+        const ProtectedPage = withAuth(SecretPage);
+
+        // Mouse Tracker (Render Props)
+        function MouseTracker({ render }) {
+            const [pos, setPos] = useState({ x: 0, y: 0 });
+            return (
+                <div
+                    className="card p-3"
+                    onMouseMove={(e) => setPos({ x: e.clientX, y: e.clientY })}
+                    style={{ height: "150px" }}
+                >
+                    <h5>Render Props Section</h5>
+                    {render(pos)}
+                </div>
+            );
+        }
+
+        // Login Page
+        function Login({ onLogin }) {
+            const [name, setName] = useState("");
+            return (
+                <div className="login-box text-center">
+                    <h3>Login</h3>
+                    <input
+                        className="form-control my-3"
+                        placeholder="Enter name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                    <button className="btn btn-success" onClick={() => onLogin(name)}>
+                        Login
+                    </button>
+                </div>
+            );
+        }
+
+        // Dashboard
+        function Dashboard({ user }) {
+            return (
+                <div className="container mt-4">
+                    <h2 className="text-center mb-4">Welcome, {user}</h2>
+
+                    <Navbar />
+
+                    <ProtectedPage />
+
+                    <MouseTracker
+                        render={({ x, y }) => (
+                            <p>Mouse Position: {x}, {y}</p>
+                        )}
+                    />
+                </div>
+            );
+        }
+
+        // App
+        function App() {
+            const [user, setUser] = useState(null);
+
+            return (
+                <ThemeProvider>
+                    {!user ? (
+                        <Login onLogin={setUser} />
+                    ) : (
+                        <ErrorBoundary>
+                            <Dashboard user={user} />
+                        </ErrorBoundary>
+                    )}
+                </ThemeProvider>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+
+    </script>
+</body>
+</html>
